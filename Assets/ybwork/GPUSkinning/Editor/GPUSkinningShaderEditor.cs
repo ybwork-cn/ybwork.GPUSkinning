@@ -11,17 +11,17 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
     private LitGUI.LitProperties litProperties;
     private LitDetailGUI.DetailLitProperties litDetailProperties;
 
-    //public static readonly GUIContent animMapTitle = EditorGUIUtility.TrTextContent("Anim Map");
-    //public static readonly GUIContent animMapNormalTitle = EditorGUIUtility.TrTextContent("Anim Map Normal");
-    //public static readonly string animLenTitle = "Anim Len";
-    //public static readonly string loopPropTitle = "Loop";
-    //public static readonly string currentTimeTitle = "Current Time";
+    public static readonly GUIContent boneMapTitle = EditorGUIUtility.TrTextContent("BoneMap");
+    public static readonly GUIContent bindposMapTitle = EditorGUIUtility.TrTextContent("_BindposMap");
+    public static readonly string animLenTitle = "Anim Len";
+    public static readonly string loopPropTitle = "Loop";
+    public static readonly string currentTimeTitle = "Current Time";
 
-    //protected MaterialProperty AnimMapProp { get; set; }
-    //protected MaterialProperty AnimMapNormalProp { get; set; }
-    //protected MaterialProperty AnimLenProp { get; set; }
-    //protected MaterialProperty CurrentTimeProp { get; set; }
-    //protected MaterialProperty LoopProp { get; set; }
+    protected MaterialProperty BoneMapProp { get; set; }
+    protected MaterialProperty BindposMapProp { get; set; }
+    protected MaterialProperty AnimLenProp { get; set; }
+    protected MaterialProperty CurrentTimeProp { get; set; }
+    protected MaterialProperty LoopProp { get; set; }
 
     public override void FillAdditionalFoldouts(MaterialHeaderScopeList materialScopesList)
     {
@@ -36,11 +36,11 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
         base.FindProperties(properties);
         litProperties = new LitGUI.LitProperties(properties);
         litDetailProperties = new LitDetailGUI.DetailLitProperties(properties);
-        //AnimMapProp = FindProperty("_AnimMap", properties, propertyIsMandatory: false);
-        //AnimMapNormalProp = FindProperty("_AnimMapNormal", properties, propertyIsMandatory: false);
-        //AnimLenProp = FindProperty("_AnimLen", properties, propertyIsMandatory: false);
-        //LoopProp = FindProperty("_Loop", properties, propertyIsMandatory: false);
-        //CurrentTimeProp = FindProperty("_CurrentTime", properties, propertyIsMandatory: false);
+        BoneMapProp = FindProperty("_BoneMap", properties, propertyIsMandatory: false);
+        BindposMapProp = FindProperty("_BindposMap", properties, propertyIsMandatory: false);
+        AnimLenProp = FindProperty("_AnimLen", properties, propertyIsMandatory: false);
+        LoopProp = FindProperty("_Loop", properties, propertyIsMandatory: false);
+        CurrentTimeProp = FindProperty("_CurrentTime", properties, propertyIsMandatory: false);
     }
 
     public override void ValidateMaterial(Material material)
@@ -61,11 +61,11 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
 
     public override void DrawSurfaceInputs(Material material)
     {
-        //materialEditor.TexturePropertySingleLine(animMapTitle, AnimMapProp);
-        //materialEditor.TexturePropertySingleLine(animMapNormalTitle, AnimMapNormalProp);
-        //materialEditor.ShaderProperty(AnimLenProp, animLenTitle);
-        //materialEditor.ShaderProperty(LoopProp, loopPropTitle);
-        //materialEditor.ShaderProperty(CurrentTimeProp, currentTimeTitle);
+        materialEditor.TexturePropertySingleLine(boneMapTitle, BoneMapProp);
+        materialEditor.TexturePropertySingleLine(bindposMapTitle, BindposMapProp);
+        materialEditor.ShaderProperty(AnimLenProp, animLenTitle);
+        materialEditor.ShaderProperty(LoopProp, loopPropTitle);
+        materialEditor.ShaderProperty(CurrentTimeProp, currentTimeTitle);
         EditorGUILayout.Space();
 
         base.DrawSurfaceInputs(material);

@@ -4,6 +4,13 @@ Shader "ybwork/URP/GPUSkinningShader"
 {
     Properties
     {
+        _BoneMapaaaaa("Bone Mapaaaa", 2DArray) = "" {}
+        _BoneMap("Bone Map", 2D) = "white" {}
+        _BindposMap("BindposMap", 2D) = "white" {}
+        _AnimLen("Anim Length", Float) = 0
+        [ToggleUI] _Loop("Loop", Float) = 0
+        _CurrentTime("Current Time", Float) = 0
+
         // Specular vs Metallic workflow
         _WorkflowMode("WorkflowMode", Float) = 1.0
 
@@ -176,5 +183,5 @@ Shader "ybwork/URP/GPUSkinningShader"
     }
 
     FallBack "Hidden/Universal Render Pipeline/FallbackError"
-    CustomEditor "GPUSkinningShaderEditor"
+    // CustomEditor "GPUSkinningShaderEditor"
 }

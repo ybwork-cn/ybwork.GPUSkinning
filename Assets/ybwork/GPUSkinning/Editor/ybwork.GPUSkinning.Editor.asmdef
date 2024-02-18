@@ -5,7 +5,7 @@
         "Unity.RenderPipelines.Core.Editor",
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.RenderPipelines.Universal.Editor",
-        "ybwork.AnimMapBaker"
+        "ybwork.GPUSkinning"
     ],
     "includePlatforms": [
         "Editor"
