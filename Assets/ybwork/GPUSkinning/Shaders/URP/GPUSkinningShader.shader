@@ -1,10 +1,9 @@
-﻿// Created by 月北(ybwork) https :// github.com / ybwork - cn/
+﻿// Created by 月北(ybwork) https://github.com/ybwork-cn/
 
 Shader "ybwork/URP/GPUSkinningShader"
 {
     Properties
     {
-        _BoneMapaaaaa("Bone Mapaaaa", 2DArray) = "" {}
         _BoneMap("Bone Map", 2D) = "white" {}
         _BindposMap("BindposMap", 2D) = "white" {}
         _AnimLen("Anim Length", Float) = 0
@@ -183,5 +182,5 @@ Shader "ybwork/URP/GPUSkinningShader"
     }
 
     FallBack "Hidden/Universal Render Pipeline/FallbackError"
-    // CustomEditor "GPUSkinningShaderEditor"
+    CustomEditor "GPUSkinningShaderEditor"
 }

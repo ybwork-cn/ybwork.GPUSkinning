@@ -5,7 +5,7 @@ SET ToolVersion=upm
 ::设置模块源路径
 SET ToolAssetPath=Assets/ybwork/GPUSkinning
 
-git branch -d %ToolName%
+git branch -D %ToolName%
 git remote rm %ToolName%
 ::此命令会创建一个ToolName的分支，并同步ToolAssetPath下的内容
 git subtree split -P %ToolAssetPath% --branch %ToolName%
