@@ -4,11 +4,11 @@ Shader "ybwork/URP/GPUSkinningShader"
 {
     Properties
     {
-        _BoneMap("Bone Map", 2D) = "white" {}
+        _BoneMap("BoneMap", 2D) = "white" {}
         _BindposMap("BindposMap", 2D) = "white" {}
-        _AnimLen("Anim Length", Float) = 0
-        [ToggleUI] _Loop("Loop", Float) = 0
-        _CurrentTime("Current Time", Float) = 0
+        _AnimInfosMap("AnimInfosMap", 2D) = "white" {}
+        _AnimIndex("AnimIndex", Int) = 0
+        _CurrentTime("CurrentTime", Float) = 0
 
         // Specular vs Metallic workflow
         _WorkflowMode("WorkflowMode", Float) = 1.0

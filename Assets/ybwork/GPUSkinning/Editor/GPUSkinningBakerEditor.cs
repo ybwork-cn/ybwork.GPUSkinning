@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -71,20 +72,17 @@ public readonly struct AnimData
     #endregion
 }
 
-/// <summary>
-/// 烘焙后的数据
-/// </summary>
-public readonly struct BakedData
+public readonly struct AnimInfo
 {
-    public readonly string Name;
-    public readonly float AnimLen;
-    public readonly Texture2D BoneMap;
+    public readonly int StartFrame;
+    public readonly int FrameCount;
+    public readonly AnimationState AnimationState;
 
-    public BakedData(string name, float animLen, Texture2D boneMap)
+    public AnimInfo(AnimationState animationState, int startFrame)
     {
-        Name = name;
-        AnimLen = animLen;
-        BoneMap = boneMap;
+        StartFrame = startFrame;
+        FrameCount = (int)(animationState.clip.frameRate * animationState.length + 1);
+        AnimationState = animationState;
     }
 }
 
@@ -93,7 +91,8 @@ public static class GPUSkinningBakerUtils
     private static Shader URPShader => Shader.Find("ybwork/URP/GPUSkinningShader");
     private static int BoneMapProp => Shader.PropertyToID("_BoneMap");
     private static int BindposMapProp => Shader.PropertyToID("_BindposMap");
-    private static int AnimLenProp => Shader.PropertyToID("_AnimLen");
+    private static int AnimInfosMapProp => Shader.PropertyToID("_AnimInfosMap");
+    private static int FullAnimLenProp => Shader.PropertyToID("_FullAnimLen");
 
     // 在文件夹上添加右键菜单项
     [MenuItem("Assets/GPUSkinningBaker/SaveAll", true, 30)]
@@ -144,7 +143,7 @@ public static class GPUSkinningBakerUtils
             combine[i].transform = skinnedMeshRenderers[i].transform.localToWorldMatrix;
         }
 
-        Mesh mesh = new Mesh();
+        var mesh = new Mesh();
         mesh.CombineMeshes(combine, mergeSubMeshes: true, useMatrices: false);
 
         return mesh;
@@ -152,57 +151,33 @@ public static class GPUSkinningBakerUtils
 
     private static void Save(string assetPath, GPUSkinningBaker baker)
     {
-        List<BakedData> datas = Bake(baker);
-        var textures = datas.Select(data => SaveAsAsset(assetPath, baker, data)).ToArray();
+        Texture2D boneMap = BakeBoneMap(baker, out List<AnimInfo> animInfos);
+        SaveAsset(CreateFolder(assetPath, "Textures"), "boneMap.asset", boneMap);
 
-        string folderPath = CreateFolder(assetPath);
         Mesh sharedMesh = CombineMeshes(baker.GetComponentsInChildren<SkinnedMeshRenderer>());
-        //Mesh sharedMesh = baker.GetComponentInChildren<SkinnedMeshRenderer>().sharedMesh;
-        AssetDatabase.CreateAsset(sharedMesh, Path.Combine(folderPath, $"{baker.name}.mesh"));
+        SaveAsset(CreateFolder(assetPath, "Meshes"), baker.name + ".mesh", sharedMesh);
 
-        Texture2D bindposMap = new Texture2D(sharedMesh.bindposeCount, 4, TextureFormat.RGBAHalf, true)
-        {
-            wrapMode = TextureWrapMode.Clamp,
-            name = "bindposMap"
-        };
-        for (int j = 0; j < sharedMesh.bindposeCount; j++)
-        {
-            Matrix4x4 bindpos = sharedMesh.bindposes[j];
-            Matrix4x4 matrix = sharedMesh.bindposes[j];
-            //bindposMap.SetPixel(j, 0, new Color(matrix.m00, matrix.m10, matrix.m20, matrix.m30));
-            //bindposMap.SetPixel(j, 1, new Color(matrix.m01, matrix.m11, matrix.m21, matrix.m31));
-            //bindposMap.SetPixel(j, 2, new Color(matrix.m02, matrix.m12, matrix.m22, matrix.m32));
-            //bindposMap.SetPixel(j, 3, new Color(matrix.m03, matrix.m13, matrix.m23, matrix.m33));
-            bindposMap.SetPixel(j, 0, new Color(matrix.m00, matrix.m01, matrix.m02, matrix.m03));
-            bindposMap.SetPixel(j, 1, new Color(matrix.m10, matrix.m11, matrix.m12, matrix.m13));
-            bindposMap.SetPixel(j, 2, new Color(matrix.m20, matrix.m21, matrix.m22, matrix.m23));
-            bindposMap.SetPixel(j, 3, new Color(matrix.m30, matrix.m31, matrix.m32, matrix.m33));
-        }
-        bindposMap.Apply();
-        string bindposMapPath = Path.Combine(folderPath, $"{bindposMap.name}.asset");
-        if (File.Exists(bindposMapPath))
-            File.Delete(bindposMapPath);
-        AssetDatabase.CreateAsset(bindposMap, bindposMapPath);
+        Texture2D bindposMap = BakeBindposMap(sharedMesh);
+        SaveAsset(CreateFolder(assetPath, "Textures"), "bindposMap.asset", bindposMap);
+
+        Texture2D animInfosMap = BakeAnimInfosMap(animInfos);
+        SaveAsset(CreateFolder(assetPath, "Textures"), "animInfosMap.asset", animInfosMap);
 
         for (int i = 0; i < baker.Materials.Count; i++)
         {
-            string name = (i + 1).ToString();
-            Material[] materials = Enumerable.Range(0, datas.Count)
-                .Select(index => SaveAsMat(assetPath, baker, name, datas[index], baker.Materials[i], textures[index], bindposMap))
-                .OrderBy(material => material.name)
-                .ToArray();
-            string path = Path.Combine(folderPath, $"{baker.name}_{name}.prefab");
-            SaveAsPrefab(path, sharedMesh, materials);
+            string name = baker.name + (i + 1).ToString() + ".mat";
+            Material material = CreateMaterial(baker.Materials[i], boneMap.height / 30, boneMap, bindposMap, animInfosMap);
+            SaveAsset(CreateFolder(assetPath, "Materials"), name, material);
+            SaveAsPrefab(CreateFolder(assetPath), baker.name + ".prefab", sharedMesh, material);
         }
     }
 
-    private static List<BakedData> Bake(GPUSkinningBaker baker)
+    private static Texture2D BakeBoneMap(GPUSkinningBaker baker, out List<AnimInfo> animInfos)
     {
-        AnimData animData = new AnimData(baker);
+        AnimData animData = new(baker);
 
-        List<BakedData> bakedDataList = new();
-
-        //每一个动作都生成一个动作图
+        // 记录每个动画的信息
+        animInfos = new();
         foreach (AnimationState animationState in animData.AnimationClips)
         {
             if (!animationState.clip.legacy)
@@ -210,91 +185,124 @@ public static class GPUSkinningBakerUtils
                 Debug.LogError(string.Format($"{animationState.clip.name} is not legacy!!"));
                 continue;
             }
-            bakedDataList.Add(BakePerAnimClip(animData, animationState));
+
+            animInfos.Add(new AnimInfo(animationState, animInfos.Sum(item => item.FrameCount)));
         }
-        return bakedDataList;
-    }
 
-    private static BakedData BakePerAnimClip(AnimData animData, AnimationState curAnim)
-    {
-        float sampleTime = 0;
-        int curClipFrame = Mathf.ClosestPowerOfTwo((int)(curAnim.clip.frameRate * curAnim.length + 1));
-        float perFrameTime = curAnim.length / (curClipFrame - 1);
-        Debug.Log(curAnim.clip.name + ":" + curAnim.clip.frameRate + ":" + curAnim.length);
-
-        Texture2D boneMap = new Texture2D(animData.MapWidth * 4, curClipFrame, TextureFormat.RGBAHalf, true)
+        Texture2D boneMap = new(Mathf.NextPowerOfTwo(animData.MapWidth * 4), animInfos.Sum(item => item.FrameCount), TextureFormat.RGBAFloat, true)
         {
             wrapMode = TextureWrapMode.Clamp,
-            name = curAnim.name
+            name = "boneMap"
         };
-        animData.AnimationPlay(curAnim.name);
+
+        foreach (AnimInfo animInfo in animInfos)
+        {
+            BakePerAnimClip(boneMap, animData, animInfo);
+        }
+
+        boneMap.filterMode = FilterMode.Point;
+        return boneMap;
+    }
+
+    private static Texture2D BakeBindposMap(Mesh sharedMesh)
+    {
+        Texture2D bindposMap = new(Mathf.NextPowerOfTwo(sharedMesh.bindposeCount), 4, TextureFormat.RGBAFloat, true)
+        {
+            wrapMode = TextureWrapMode.Clamp,
+            name = "bindposMap"
+        };
+        for (int j = 0; j < sharedMesh.bindposeCount; j++)
+        {
+            Matrix4x4 matrix = sharedMesh.bindposes[j];
+            bindposMap.SetPixel(j, 0, new Color(matrix.m00, matrix.m01, matrix.m02, matrix.m03));
+            bindposMap.SetPixel(j, 1, new Color(matrix.m10, matrix.m11, matrix.m12, matrix.m13));
+            bindposMap.SetPixel(j, 2, new Color(matrix.m20, matrix.m21, matrix.m22, matrix.m23));
+            bindposMap.SetPixel(j, 3, new Color(matrix.m30, matrix.m31, matrix.m32, matrix.m33));
+        }
+        bindposMap.Apply();
+        bindposMap.filterMode = FilterMode.Point;
+        return bindposMap;
+    }
+
+    private static Texture2D BakeAnimInfosMap(List<AnimInfo> animInfos)
+    {
+        Texture2D animInfosMap = new(Mathf.NextPowerOfTwo(animInfos.Count), 2, TextureFormat.RGBAFloat, true)
+        {
+            wrapMode = TextureWrapMode.Clamp,
+            name = "animInfosMap"
+        };
+        float fullAnimFrameCount = animInfos.Sum(item => item.FrameCount);
+        for (int i = 0; i < animInfos.Count; i++)
+        {
+            float startTime = animInfos[i].StartFrame / 30f;
+            animInfosMap.SetPixel(i, 0, new Color(startTime, startTime, startTime, 1));
+
+            float duration = (animInfos[i].FrameCount - 1) / 30f;
+            animInfosMap.SetPixel(i, 1, new Color(duration, duration, duration, 1));
+        }
+        animInfosMap.filterMode = FilterMode.Point;
+        animInfosMap.Apply();
+        return animInfosMap;
+    }
+
+    private static void BakePerAnimClip(Texture2D boneMap, AnimData animData, AnimInfo animInfo)
+    {
+        float sampleTime = 0;
+        float perFrameTime = 1 / animInfo.AnimationState.clip.frameRate;
+
+        animData.AnimationPlay(animInfo.AnimationState.name);
 
         Matrix4x4[] boneMatrices = new Matrix4x4[animData.MapWidth];
-        for (var i = 0; i < curClipFrame; i++)
+        for (var i = 0; i < animInfo.FrameCount; i++)
         {
-            curAnim.time = sampleTime;
-
+            animInfo.AnimationState.time = sampleTime;
             animData.SampleAnimAndBakeBoneMatrices(ref boneMatrices);
 
             for (int j = 0; j < boneMatrices.Length; j++)
             {
                 Matrix4x4 matrix = boneMatrices[j];
-                //boneMap.SetPixel(j * 4 + 0, i, new Color(matrix.m00, matrix.m10, matrix.m20, matrix.m30));
-                //boneMap.SetPixel(j * 4 + 1, i, new Color(matrix.m01, matrix.m11, matrix.m21, matrix.m31));
-                //boneMap.SetPixel(j * 4 + 2, i, new Color(matrix.m02, matrix.m12, matrix.m22, matrix.m32));
-                //boneMap.SetPixel(j * 4 + 3, i, new Color(matrix.m03, matrix.m13, matrix.m23, matrix.m33));
-                boneMap.SetPixel(j * 4 + 0, i, new Color(matrix.m00, matrix.m01, matrix.m02, matrix.m03));
-                boneMap.SetPixel(j * 4 + 1, i, new Color(matrix.m10, matrix.m11, matrix.m12, matrix.m13));
-                boneMap.SetPixel(j * 4 + 2, i, new Color(matrix.m20, matrix.m21, matrix.m22, matrix.m23));
-                boneMap.SetPixel(j * 4 + 3, i, new Color(matrix.m30, matrix.m31, matrix.m32, matrix.m33));
+                boneMap.SetPixel(j * 4 + 0, i + animInfo.StartFrame, new Color(matrix.m00, matrix.m01, matrix.m02, matrix.m03));
+                boneMap.SetPixel(j * 4 + 1, i + animInfo.StartFrame, new Color(matrix.m10, matrix.m11, matrix.m12, matrix.m13));
+                boneMap.SetPixel(j * 4 + 2, i + animInfo.StartFrame, new Color(matrix.m20, matrix.m21, matrix.m22, matrix.m23));
+                boneMap.SetPixel(j * 4 + 3, i + animInfo.StartFrame, new Color(matrix.m30, matrix.m31, matrix.m32, matrix.m33));
             }
 
             sampleTime += perFrameTime;
         }
         boneMap.Apply();
-
-        return new BakedData(boneMap.name, curAnim.clip.length, boneMap);
     }
 
-    private static Texture2D SaveAsAsset(string assetPath, GPUSkinningBaker baker, BakedData data)
+    private static void SaveAsset(string folderPath, string filename, Object asset)
     {
-        string folderPath = CreateFolder(assetPath, "Textures");
-        string path = Path.Combine(folderPath, $"{baker.name}_{data.Name}.asset");
+        string path = Path.Combine(folderPath, filename);
         if (File.Exists(path))
             File.Delete(path);
-        AssetDatabase.CreateAsset(data.BoneMap, path);
-        return data.BoneMap;
+        AssetDatabase.CreateAsset(asset, path);
     }
 
-    private static Material SaveAsMat(string assetPath, GPUSkinningBaker baker, string name, BakedData data,
-        Material sourceMaterial, Texture2D boneMap, Texture2D bindposMap)
+    private static Material CreateMaterial(Material sourceMaterial, float fullAnimLen,
+        Texture2D boneMap, Texture2D bindposMap, Texture2D animInfosMap)
     {
-        string folderPath = CreateFolder(assetPath, "Matrials");
-        string path = Path.Combine(folderPath, $"{baker.name}_{name}_{data.Name}.mat");
-        if (File.Exists(path))
-            File.Delete(path);
-
         var material = new Material(URPShader);
         material.CopyMatchingPropertiesFromMaterial(sourceMaterial);
         material.SetTexture(BoneMapProp, boneMap);
         material.SetTexture(BindposMapProp, bindposMap);
-        material.SetFloat(AnimLenProp, data.AnimLen);
+        material.SetTexture(AnimInfosMapProp, animInfosMap);
+        material.SetFloat(FullAnimLenProp, fullAnimLen);
         material.enableInstancing = true;
-
-        AssetDatabase.CreateAsset(material, path);
         return material;
     }
 
-    private static void SaveAsPrefab(string path, Mesh mesh, Material[] materials)
+    private static void SaveAsPrefab(string path, string filename, Mesh mesh, Material material)
     {
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        filename = Path.Combine(path, filename);
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(filename);
         if (prefab == null)
         {
             var go = new GameObject();
             go.AddComponent<MeshFilter>().sharedMesh = mesh;
-            go.AddComponent<MeshRenderer>().material = materials[0];
-            go.AddComponent<MaterialChangerComponent>().materials = materials;
-            PrefabUtility.SaveAsPrefabAsset(go, path);
+            go.AddComponent<MeshRenderer>().material = material;
+            PrefabUtility.SaveAsPrefabAsset(go, filename);
             Object.DestroyImmediate(go);
         }
         else
@@ -305,13 +313,9 @@ public static class GPUSkinningBakerUtils
 
             if (!prefab.TryGetComponent(out MeshRenderer meshRenderer))
                 meshRenderer = prefab.AddComponent<MeshRenderer>();
-            meshRenderer.material = materials[0];
+            meshRenderer.material = material;
 
-            if (!prefab.TryGetComponent(out MaterialChangerComponent materialChangerComponent))
-                materialChangerComponent = prefab.AddComponent<MaterialChangerComponent>();
-            materialChangerComponent.materials = materials;
-
-            PrefabUtility.SaveAsPrefabAsset(prefab, path);
+            PrefabUtility.SaveAsPrefabAsset(prefab, filename);
         }
     }
 

@@ -19,8 +19,9 @@ sampler2D _BoneMap;
 float4 _BoneMap_TexelSize;
 sampler2D _BindposMap;
 float4 _BindposMap_TexelSize;
-float _AnimLen;
-float _Loop;
+sampler2D _AnimInfosMap;
+float4 _AnimInfosMap_TexelSize;
+int _AnimIndex;
 float _CurrentTime;
 
 float4 _BaseMap_ST;
@@ -43,6 +44,7 @@ CBUFFER_END
 
 UNITY_INSTANCING_BUFFER_START(Props)
 // put more per - instance properties here
+// UNITY_DEFINE_INSTANCED_PROP(float, _CurrentTime)
 UNITY_INSTANCING_BUFFER_END(Props)
 
 // NOTE: Do not ifdef the properties for dots instancing, but ifdef the actual usage.
@@ -51,7 +53,6 @@ UNITY_INSTANCING_BUFFER_END(Props)
 #ifdef UNITY_DOTS_INSTANCING_ENABLED
 
 UNITY_DOTS_INSTANCING_START(MaterialPropertyMetadata)
-    UNITY_DOTS_INSTANCED_PROP(float, _CurrentTime)
     UNITY_DOTS_INSTANCED_PROP(float4, _BaseColor)
     UNITY_DOTS_INSTANCED_PROP(float4, _SpecColor)
     UNITY_DOTS_INSTANCED_PROP(float4, _EmissionColor)

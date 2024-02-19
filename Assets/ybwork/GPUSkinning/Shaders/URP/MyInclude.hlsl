@@ -1,24 +1,31 @@
 // // Created by 月北(ybwork) https://github.com/ybwork-cn/
 
-// #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-
-float GetLoopTime(float time, float duration)
+float GetLoopTime(float t, float duration)
 {
-    return frac(time / duration);
+    return frac(t / duration) * duration;
 }
 
-float GetClampTime(float time, float duration)
+float GetClampTime(float t, float duration)
 {
-    return clamp(time / duration, 0, 1);
+    return clamp(t / duration, 0, 1) * duration;
+}
+
+float GetTime()
+{
+    // 用于GPU合批
+    // float t = UNITY_ACCESS_INSTANCED_PROP(Props, _CurrentTime);
+
+    // 用于普通渲染
+    float t = _CurrentTime;
+    float startTime = tex2Dlod(_AnimInfosMap, float4((_AnimIndex  + 0.5) * _AnimInfosMap_TexelSize.x, 0.25, 0, 0)).r;
+    float duration = tex2Dlod(_AnimInfosMap, float4((_AnimIndex  + 0.5) * _AnimInfosMap_TexelSize.x, 0.75, 0, 0)).r;
+    float fullDuration = 1.0 / _BoneMap_TexelSize.y / 30;
+    return (startTime + GetLoopTime(t, duration)) / fullDuration;
 }
 
 float4x4 GetMatrix(uint matrixIndex)
 {
-    float t = UNITY_ACCESS_INSTANCED_PROP(Props, _CurrentTime);
-    if(_Loop)
-        t = GetLoopTime(t, _AnimLen);
-    else
-        t = GetClampTime(t, _AnimLen);
+    float t = GetTime();
     return float4x4(
         tex2Dlod(_BoneMap, float4((matrixIndex * 4 + 0 + 0.5) * _BoneMap_TexelSize.x, t, 0, 0)),
         tex2Dlod(_BoneMap, float4((matrixIndex * 4 + 1 + 0.5) * _BoneMap_TexelSize.x, t, 0, 0)),

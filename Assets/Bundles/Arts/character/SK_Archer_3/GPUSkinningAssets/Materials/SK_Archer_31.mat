@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SK_Archer_3_1_pao
+  m_Name: SK_Archer_31
   m_Shader: {fileID: 4800000, guid: 586bd516e169b26429a638a0406cceb8, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -18,26 +18,27 @@ Material:
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
+  stringTagMap:
+    RenderType: Opaque
   disabledShaderPasses: []
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _AnimInfosMap:
+        m_Texture: {fileID: 2800000, guid: c486ed03f69a2ec4eabee187be18fedb, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BaseMap:
         m_Texture: {fileID: 2800000, guid: 4a02b2e02c1a5104b8ff9267699f66a8, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BindposMap:
-        m_Texture: {fileID: 2800000, guid: 37a3e94fe13473545a590a5e1dfd6b01, type: 2}
+        m_Texture: {fileID: 2800000, guid: 046391a6840d0634fb781a8ee7e6d11e, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BoneMap:
-        m_Texture: {fileID: 2800000, guid: c198d8dd94bf2c347b0297b92b48e97d, type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _BoneMapaaaaa:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: abf8a7a8d70c42146912bd2ee2850dda, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -100,14 +101,14 @@ Material:
     m_Floats:
     - _AlphaClip: 0
     - _AlphaToMask: 0
-    - _AnimLen: 0.6
+    - _AnimIndex: 0
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
-    - _CurrentTime: 0
+    - _CurrentTime: 4.43
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
@@ -117,7 +118,6 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _Loop: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
