@@ -1,19 +1,13 @@
-::ÉèÖÃÄ£¿éÃû×Ö
-SET ToolName=ybwork.GPUSkinning
-::ÉèÖÃÄ£¿é°æ±¾
-SET ToolVersion=upm
-::ÉèÖÃÄ£¿éÔ´Â·¾¶
+::è®¾ç½®åˆ†æ”¯åå­—
+SET ToolName=upm
+::è®¾ç½®æ¨¡å—æºè·¯å¾„
 SET ToolAssetPath=Assets/ybwork/GPUSkinning
 
 git branch -D %ToolName%
 git remote rm %ToolName%
-::´ËÃüÁî»á´´½¨Ò»¸öToolNameµÄ·ÖÖ§£¬²¢Í¬²½ToolAssetPathÏÂµÄÄÚÈİ
+::æ­¤å‘½ä»¤ä¼šåˆ›å»ºä¸€ä¸ªToolNameçš„åˆ†æ”¯ï¼Œå¹¶åŒæ­¥ToolAssetPathä¸‹çš„å†…å®¹
 git subtree split -P %ToolAssetPath% --branch %ToolName%
-:: ÔÚToolName·ÖÖ§ÉèÖÃ±êÇ©ToolVersion½Úµã
-git tag -d %ToolVersion%
-git tag %ToolVersion% %ToolName%
 
-:: ÍÆËÍµ½Ô¶¶Ë
-git push origin -f %ToolName% %ToolVersion%
+:: æ¨é€åˆ°è¿œç«¯
 git push origin %ToolName%
 pause
