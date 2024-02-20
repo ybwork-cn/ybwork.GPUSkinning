@@ -1,4 +1,9 @@
-// // Created by 月北(ybwork) https://github.com/ybwork-cn/
+// Created by 月北(ybwork) https://github.com/ybwork-cn/
+
+// 用于普通渲染
+#define GetTime(t) t
+// 用于GPU合批
+// #define GetTime(t) UNITY_ACCESS_INSTANCED_PROP(Props, t);
 
 float GetLoopTime(float t, float duration)
 {
@@ -10,27 +15,49 @@ float GetClampTime(float t, float duration)
     return clamp(t / duration, 0, 1) * duration;
 }
 
-float GetTime()
+float GetCurrentTime()
 {
-    // 用于GPU合批
-    // float t = UNITY_ACCESS_INSTANCED_PROP(Props, _CurrentTime);
-
-    // 用于普通渲染
-    float t = _CurrentTime;
+    float t = GetTime(_CurrentTime);
     float startTime = tex2Dlod(_AnimInfosMap, float4((_AnimIndex  + 0.5) * _AnimInfosMap_TexelSize.x, 0.25, 0, 0)).r;
     float duration = tex2Dlod(_AnimInfosMap, float4((_AnimIndex  + 0.5) * _AnimInfosMap_TexelSize.x, 0.75, 0, 0)).r;
-    float fullDuration = 1.0 / _BoneMap_TexelSize.y / 30;
-    return (startTime + GetLoopTime(t, duration)) / fullDuration;
+    return startTime + GetClampTime(t, duration);
+}
+
+float GetExitTime(out float progress)
+{
+    if(_LastAnimIndex < 0)
+    {
+        progress = 1;
+        return 0;
+    }
+
+    float t = GetTime(_LastAnimExitTime) + clamp(GetTime(_CurrentTime), 0, 1);
+    float startTime = tex2Dlod(_AnimInfosMap, float4((_LastAnimIndex  + 0.5) * _AnimInfosMap_TexelSize.x, 0.25, 0, 0)).r;
+    float duration = tex2Dlod(_AnimInfosMap, float4((_LastAnimIndex  + 0.5) * _AnimInfosMap_TexelSize.x, 0.75, 0, 0)).r;
+    progress = _CurrentTime / min(duration - _LastAnimExitTime, 0.3);
+    progress = clamp(progress, 0, 1);
+    return startTime + GetClampTime(t, duration);
 }
 
 float4x4 GetMatrix(uint matrixIndex)
 {
-    float t = GetTime();
-    return float4x4(
-        tex2Dlod(_BoneMap, float4((matrixIndex * 4 + 0 + 0.5) * _BoneMap_TexelSize.x, t, 0, 0)),
-        tex2Dlod(_BoneMap, float4((matrixIndex * 4 + 1 + 0.5) * _BoneMap_TexelSize.x, t, 0, 0)),
-        tex2Dlod(_BoneMap, float4((matrixIndex * 4 + 2 + 0.5) * _BoneMap_TexelSize.x, t, 0, 0)),
-        tex2Dlod(_BoneMap, float4((matrixIndex * 4 + 3 + 0.5) * _BoneMap_TexelSize.x, t, 0, 0)));
+    float fullDuration = 1.0 / _BoneMap_TexelSize.y / 30;
+    float t_now = GetCurrentTime() / fullDuration;
+    float4x4 mat_now = float4x4(
+        tex2Dlod(_BoneMap, float4((matrixIndex * 4 + 0 + 0.5) * _BoneMap_TexelSize.x, t_now, 0, 0)),
+        tex2Dlod(_BoneMap, float4((matrixIndex * 4 + 1 + 0.5) * _BoneMap_TexelSize.x, t_now, 0, 0)),
+        tex2Dlod(_BoneMap, float4((matrixIndex * 4 + 2 + 0.5) * _BoneMap_TexelSize.x, t_now, 0, 0)),
+        tex2Dlod(_BoneMap, float4((matrixIndex * 4 + 3 + 0.5) * _BoneMap_TexelSize.x, t_now, 0, 0)));
+
+    float progress;
+    float t_last = GetExitTime(progress) / fullDuration;
+    float4x4 mat_last = float4x4(
+        tex2Dlod(_BoneMap, float4((matrixIndex * 4 + 0 + 0.5) * _BoneMap_TexelSize.x, t_last, 0, 0)),
+        tex2Dlod(_BoneMap, float4((matrixIndex * 4 + 1 + 0.5) * _BoneMap_TexelSize.x, t_last, 0, 0)),
+        tex2Dlod(_BoneMap, float4((matrixIndex * 4 + 2 + 0.5) * _BoneMap_TexelSize.x, t_last, 0, 0)),
+        tex2Dlod(_BoneMap, float4((matrixIndex * 4 + 3 + 0.5) * _BoneMap_TexelSize.x, t_last, 0, 0)));
+
+    return lerp(mat_last, mat_now, progress);
 }
 
 float4x4 GetBindpos(uint matrixIndex)

@@ -16,12 +16,16 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
     public static readonly GUIContent animInfosMapTitle = EditorGUIUtility.TrTextContent("AnimInfosMap");
     public static readonly string animIndexTitle = "Anim Index";
     public static readonly string currentTimeTitle = "Current Time";
+    public static readonly string lastAnimIndexTitle = "Last Anim Index";
+    public static readonly string lastAnimExitTimeTitle = "Last Anim Exit Time";
 
     protected MaterialProperty BoneMapProp { get; set; }
     protected MaterialProperty BindposMapProp { get; set; }
     protected MaterialProperty AnimInfosMapProp { get; set; }
     protected MaterialProperty AnimIndexProp { get; set; }
     protected MaterialProperty CurrentTimeProp { get; set; }
+    protected MaterialProperty LastAnimIndexProp { get; set; }
+    protected MaterialProperty LastAnimExitTimeProp { get; set; }
 
     public override void FillAdditionalFoldouts(MaterialHeaderScopeList materialScopesList)
     {
@@ -41,6 +45,8 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
         AnimInfosMapProp = FindProperty("_AnimInfosMap", properties, propertyIsMandatory: false);
         AnimIndexProp = FindProperty("_AnimIndex", properties, propertyIsMandatory: false);
         CurrentTimeProp = FindProperty("_CurrentTime", properties, propertyIsMandatory: false);
+        LastAnimIndexProp = FindProperty("_LastAnimIndex", properties, propertyIsMandatory: false);
+        LastAnimExitTimeProp = FindProperty("_LastAnimExitTime", properties, propertyIsMandatory: false);
     }
 
     public override void ValidateMaterial(Material material)
@@ -66,6 +72,9 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
         materialEditor.TexturePropertySingleLine(animInfosMapTitle, AnimInfosMapProp);
         materialEditor.IntShaderProperty(AnimIndexProp, new GUIContent(animIndexTitle));
         materialEditor.ShaderProperty(CurrentTimeProp, currentTimeTitle);
+        EditorGUILayout.Space();
+        materialEditor.IntShaderProperty(LastAnimIndexProp, new GUIContent(lastAnimIndexTitle));
+        materialEditor.ShaderProperty(LastAnimExitTimeProp, lastAnimExitTimeTitle);
         EditorGUILayout.Space();
 
 

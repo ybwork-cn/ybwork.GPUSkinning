@@ -23,6 +23,8 @@ sampler2D _AnimInfosMap;
 float4 _AnimInfosMap_TexelSize;
 int _AnimIndex;
 float _CurrentTime;
+int _LastAnimIndex;
+float _LastAnimExitTime;
 
 float4 _BaseMap_ST;
 float4 _DetailAlbedoMap_ST;
