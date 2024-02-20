@@ -1,7 +1,7 @@
 // Created by 月北(ybwork) https://github.com/ybwork-cn/
 
 // 用于普通渲染
-#define GetTime(t) t
+#define GetProp(t) t
 // 用于GPU合批
 // #define GetTime(t) UNITY_ACCESS_INSTANCED_PROP(Props, t);
 
@@ -17,25 +17,31 @@ float GetClampTime(float t, float duration)
 
 float GetCurrentTime()
 {
-    float t = GetTime(_CurrentTime);
     float startTime = tex2Dlod(_AnimInfosMap, float4((_AnimIndex  + 0.5) * _AnimInfosMap_TexelSize.x, 0.25, 0, 0)).r;
     float duration = tex2Dlod(_AnimInfosMap, float4((_AnimIndex  + 0.5) * _AnimInfosMap_TexelSize.x, 0.75, 0, 0)).r;
-    return startTime + GetClampTime(t, duration);
+
+    float t = GetProp(_CurrentTime);
+    if(GetProp(_Loop))
+        return startTime + GetLoopTime(t, duration);
+    else
+        return startTime + GetClampTime(t, duration);
 }
 
 float GetExitTime(out float progress)
 {
-    if(_LastAnimIndex < 0)
+    if(GetProp(_LastAnimIndex) < 0)
     {
         progress = 1;
         return 0;
     }
 
-    float t = GetTime(_LastAnimExitTime) + clamp(GetTime(_CurrentTime), 0, 1);
     float startTime = tex2Dlod(_AnimInfosMap, float4((_LastAnimIndex  + 0.5) * _AnimInfosMap_TexelSize.x, 0.25, 0, 0)).r;
     float duration = tex2Dlod(_AnimInfosMap, float4((_LastAnimIndex  + 0.5) * _AnimInfosMap_TexelSize.x, 0.75, 0, 0)).r;
-    progress = _CurrentTime / min(duration - _LastAnimExitTime, 0.3);
+
+    float lastAnimExitTime = GetLoopTime(GetProp(_LastAnimExitTime), duration);
+    progress = GetProp(_CurrentTime) / min(duration - lastAnimExitTime, 0.3);
     progress = clamp(progress, 0, 1);
+    float t = lastAnimExitTime + GetProp(_CurrentTime);
     return startTime + GetClampTime(t, duration);
 }
 

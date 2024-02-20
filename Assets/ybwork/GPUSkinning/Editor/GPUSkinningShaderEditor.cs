@@ -14,6 +14,7 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
     public static readonly GUIContent boneMapTitle = EditorGUIUtility.TrTextContent("BoneMap");
     public static readonly GUIContent bindposMapTitle = EditorGUIUtility.TrTextContent("BindposMap");
     public static readonly GUIContent animInfosMapTitle = EditorGUIUtility.TrTextContent("AnimInfosMap");
+    public static readonly string loopTitle = "Loop";
     public static readonly string animIndexTitle = "Anim Index";
     public static readonly string currentTimeTitle = "Current Time";
     public static readonly string lastAnimIndexTitle = "Last Anim Index";
@@ -22,6 +23,7 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
     protected MaterialProperty BoneMapProp { get; set; }
     protected MaterialProperty BindposMapProp { get; set; }
     protected MaterialProperty AnimInfosMapProp { get; set; }
+    protected MaterialProperty LoopProp { get; set; }
     protected MaterialProperty AnimIndexProp { get; set; }
     protected MaterialProperty CurrentTimeProp { get; set; }
     protected MaterialProperty LastAnimIndexProp { get; set; }
@@ -43,6 +45,7 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
         BoneMapProp = FindProperty("_BoneMap", properties, propertyIsMandatory: false);
         BindposMapProp = FindProperty("_BindposMap", properties, propertyIsMandatory: false);
         AnimInfosMapProp = FindProperty("_AnimInfosMap", properties, propertyIsMandatory: false);
+        LoopProp = FindProperty("_Loop", properties, propertyIsMandatory: false);
         AnimIndexProp = FindProperty("_AnimIndex", properties, propertyIsMandatory: false);
         CurrentTimeProp = FindProperty("_CurrentTime", properties, propertyIsMandatory: false);
         LastAnimIndexProp = FindProperty("_LastAnimIndex", properties, propertyIsMandatory: false);
@@ -70,6 +73,7 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
         materialEditor.TexturePropertySingleLine(boneMapTitle, BoneMapProp);
         materialEditor.TexturePropertySingleLine(bindposMapTitle, BindposMapProp);
         materialEditor.TexturePropertySingleLine(animInfosMapTitle, AnimInfosMapProp);
+        materialEditor.ShaderProperty(LoopProp, new GUIContent(loopTitle));
         materialEditor.IntShaderProperty(AnimIndexProp, new GUIContent(animIndexTitle));
         materialEditor.ShaderProperty(CurrentTimeProp, currentTimeTitle);
         EditorGUILayout.Space();

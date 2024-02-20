@@ -21,6 +21,7 @@ sampler2D _BindposMap;
 float4 _BindposMap_TexelSize;
 sampler2D _AnimInfosMap;
 float4 _AnimInfosMap_TexelSize;
+bool _Loop;
 int _AnimIndex;
 float _CurrentTime;
 int _LastAnimIndex;

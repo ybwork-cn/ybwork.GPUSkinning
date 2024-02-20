@@ -8,6 +8,7 @@ Shader "ybwork/URP/GPUSkinningShader"
         _BindposMap("Bindpos Map", 2D) = "white" {}
         _AnimInfosMap("Anim Infos Map", 2D) = "white" {}
 
+        [ToggleUI] _Loop("Loop", Float) = 0
         _AnimIndex("Anim Index", Int) = 0
         _CurrentTime("Current Time", Float) = 0
 

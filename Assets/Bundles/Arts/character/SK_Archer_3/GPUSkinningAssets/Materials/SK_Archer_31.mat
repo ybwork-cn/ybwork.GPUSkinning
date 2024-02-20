@@ -101,14 +101,14 @@ Material:
     m_Floats:
     - _AlphaClip: 0
     - _AlphaToMask: 0
-    - _AnimIndex: 0
+    - _AnimIndex: 1
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
-    - _CurrentTime: 4.43
+    - _CurrentTime: 37.1
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
@@ -118,6 +118,9 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
+    - _LastAnimExitTime: 0.2
+    - _LastAnimIndex: 0
+    - _Loop: 1
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
