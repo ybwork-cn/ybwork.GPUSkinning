@@ -24,6 +24,7 @@ float4 _AnimInfosMap_TexelSize;
 bool _Loop;
 int _AnimIndex;
 float _CurrentTime;
+bool _LastAnimLoop;
 int _LastAnimIndex;
 float _LastAnimExitTime;
 

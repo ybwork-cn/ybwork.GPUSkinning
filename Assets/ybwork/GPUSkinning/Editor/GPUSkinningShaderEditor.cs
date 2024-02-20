@@ -17,6 +17,7 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
     public static readonly string loopTitle = "Loop";
     public static readonly string animIndexTitle = "Anim Index";
     public static readonly string currentTimeTitle = "Current Time";
+    public static readonly string lastAnimLoopTitle = "Last Anim Loop";
     public static readonly string lastAnimIndexTitle = "Last Anim Index";
     public static readonly string lastAnimExitTimeTitle = "Last Anim Exit Time";
 
@@ -26,6 +27,7 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
     protected MaterialProperty LoopProp { get; set; }
     protected MaterialProperty AnimIndexProp { get; set; }
     protected MaterialProperty CurrentTimeProp { get; set; }
+    protected MaterialProperty LastAnimLoopProp { get; set; }
     protected MaterialProperty LastAnimIndexProp { get; set; }
     protected MaterialProperty LastAnimExitTimeProp { get; set; }
 
@@ -48,6 +50,7 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
         LoopProp = FindProperty("_Loop", properties, propertyIsMandatory: false);
         AnimIndexProp = FindProperty("_AnimIndex", properties, propertyIsMandatory: false);
         CurrentTimeProp = FindProperty("_CurrentTime", properties, propertyIsMandatory: false);
+        LastAnimLoopProp = FindProperty("_LastAnimLoop", properties, propertyIsMandatory: false);
         LastAnimIndexProp = FindProperty("_LastAnimIndex", properties, propertyIsMandatory: false);
         LastAnimExitTimeProp = FindProperty("_LastAnimExitTime", properties, propertyIsMandatory: false);
     }
@@ -77,6 +80,7 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
         materialEditor.IntShaderProperty(AnimIndexProp, new GUIContent(animIndexTitle));
         materialEditor.ShaderProperty(CurrentTimeProp, currentTimeTitle);
         EditorGUILayout.Space();
+        materialEditor.ShaderProperty(LastAnimLoopProp, new GUIContent(lastAnimLoopTitle));
         materialEditor.IntShaderProperty(LastAnimIndexProp, new GUIContent(lastAnimIndexTitle));
         materialEditor.ShaderProperty(LastAnimExitTimeProp, lastAnimExitTimeTitle);
         EditorGUILayout.Space();

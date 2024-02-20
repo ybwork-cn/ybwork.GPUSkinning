@@ -7,27 +7,32 @@ public class GPUSkinningData
     public bool Loop;
     public int AnimIndex;
     public float CurrentTime;
+
+    public bool LastAnimLoop;
     public int LastAnimIndex;
     public float LastAnimExitTime;
 
     public void SwitchState(Material material, int state, bool loop)
     {
-        Loop = loop;
+        LastAnimLoop = Loop;
         LastAnimIndex = AnimIndex;
         LastAnimExitTime = CurrentTime;
+        Loop = loop;
         AnimIndex = state;
         CurrentTime = 0;
 
         material.SetFloat("_Loop", Loop ? 1 : 0);
         material.SetFloat("_AnimIndex", AnimIndex);
         material.SetFloat("_CurrentTime", CurrentTime);
+
+        material.SetFloat("_LastAnimLoop", LastAnimLoop ? 1 : 0);
         material.SetFloat("_LastAnimIndex", LastAnimIndex);
         material.SetFloat("_LastAnimExitTime", LastAnimExitTime);
     }
 
     public void Update(Material material, float deltaTime)
     {
-        CurrentTime += deltaTime / 3;
+        CurrentTime += deltaTime;
         material.SetFloat("_CurrentTime", CurrentTime);
     }
 }
@@ -40,6 +45,7 @@ public class GPUSkinningComponent : MonoBehaviour
     private void Awake()
     {
         _material = GetComponent<MeshRenderer>().material;
+        _gpuSkinningData.SwitchState(_material, 0, true);
     }
 
     private void Update()

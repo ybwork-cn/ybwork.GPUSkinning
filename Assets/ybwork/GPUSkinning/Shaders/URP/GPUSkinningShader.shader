@@ -12,6 +12,7 @@ Shader "ybwork/URP/GPUSkinningShader"
         _AnimIndex("Anim Index", Int) = 0
         _CurrentTime("Current Time", Float) = 0
 
+        [ToggleUI] _LastAnimLoop("Last Anim Loop", Float) = 0
         _LastAnimIndex("Last Anim Index", Int) = 0
         _LastAnimExitTime("Last Anim Exit Time", Float) = 0
 

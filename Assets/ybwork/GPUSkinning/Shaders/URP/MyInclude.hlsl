@@ -38,8 +38,12 @@ float GetExitTime(out float progress)
     float startTime = tex2Dlod(_AnimInfosMap, float4((_LastAnimIndex  + 0.5) * _AnimInfosMap_TexelSize.x, 0.25, 0, 0)).r;
     float duration = tex2Dlod(_AnimInfosMap, float4((_LastAnimIndex  + 0.5) * _AnimInfosMap_TexelSize.x, 0.75, 0, 0)).r;
 
-    float lastAnimExitTime = GetLoopTime(GetProp(_LastAnimExitTime), duration);
-    progress = GetProp(_CurrentTime) / min(duration - lastAnimExitTime, 0.3);
+    float lastAnimExitTime;
+    if(GetProp(_LastAnimLoop))
+        lastAnimExitTime = GetLoopTime(GetProp(_LastAnimExitTime), duration);
+    else
+        lastAnimExitTime = GetClampTime(GetProp(_LastAnimExitTime), duration);
+    progress = GetProp(_CurrentTime) / 0.3;
     progress = clamp(progress, 0, 1);
     float t = lastAnimExitTime + GetProp(_CurrentTime);
     return startTime + GetClampTime(t, duration);
