@@ -1,7 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
-[Serializable]
+[System.Serializable]
 public class GPUSkinningData
 {
     public bool Loop;
@@ -12,7 +11,14 @@ public class GPUSkinningData
     public int LastAnimIndex;
     public float LastAnimExitTime;
 
-    public void SwitchState(Material material, int state, bool loop)
+    private readonly Material _material;
+
+    public GPUSkinningData(Material material)
+    {
+        this._material = material;
+    }
+
+    public void SwitchState(int state, bool loop)
     {
         LastAnimLoop = Loop;
         LastAnimIndex = AnimIndex;
@@ -21,42 +27,45 @@ public class GPUSkinningData
         AnimIndex = state;
         CurrentTime = 0;
 
-        material.SetFloat("_Loop", Loop ? 1 : 0);
-        material.SetFloat("_AnimIndex", AnimIndex);
-        material.SetFloat("_CurrentTime", CurrentTime);
+        _material.SetFloat("_Loop", Loop ? 1 : 0);
+        _material.SetFloat("_AnimIndex", AnimIndex);
+        _material.SetFloat("_CurrentTime", CurrentTime);
 
-        material.SetFloat("_LastAnimLoop", LastAnimLoop ? 1 : 0);
-        material.SetFloat("_LastAnimIndex", LastAnimIndex);
-        material.SetFloat("_LastAnimExitTime", LastAnimExitTime);
+        _material.SetFloat("_LastAnimLoop", LastAnimLoop ? 1 : 0);
+        _material.SetFloat("_LastAnimIndex", LastAnimIndex);
+        _material.SetFloat("_LastAnimExitTime", LastAnimExitTime);
     }
 
-    public void Update(Material material, float deltaTime)
+    public void Update(float deltaTime)
     {
         CurrentTime += deltaTime;
-        material.SetFloat("_CurrentTime", CurrentTime);
+        _material.SetFloat("_CurrentTime", CurrentTime);
     }
 }
 
 public class GPUSkinningComponent : MonoBehaviour
 {
     Material _material;
+
     [SerializeField] GPUSkinningData _gpuSkinningData;
+    public GPUSkinningData GpuSkinningData => _gpuSkinningData;
 
     private void Awake()
     {
         _material = GetComponent<MeshRenderer>().material;
-        _gpuSkinningData.SwitchState(_material, 0, true);
+        _gpuSkinningData = new GPUSkinningData(_material);
+        GpuSkinningData.SwitchState(0, true);
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Keypad1))
-            _gpuSkinningData.SwitchState(_material, 0, true);
+            GpuSkinningData.SwitchState(0, true);
         if (Input.GetKeyDown(KeyCode.Keypad2))
-            _gpuSkinningData.SwitchState(_material, 1, true);
+            GpuSkinningData.SwitchState(1, true);
         if (Input.GetKeyDown(KeyCode.Keypad3))
-            _gpuSkinningData.SwitchState(_material, 2, false);
+            GpuSkinningData.SwitchState(2, false);
 
-        _gpuSkinningData.Update(_material, Time.deltaTime);
+        GpuSkinningData.Update(Time.deltaTime);
     }
 }
