@@ -119,6 +119,7 @@ Material:
     - _GlossyReflections: 1
     - _LastAnimExitTime: 0
     - _LastAnimIndex: 0
+    - _LastAnimLoop: 0
     - _Loop: 0
     - _Metallic: 0
     - _OcclusionStrength: 1

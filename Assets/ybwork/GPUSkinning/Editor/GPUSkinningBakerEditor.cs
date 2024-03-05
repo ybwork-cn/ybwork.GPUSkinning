@@ -3,7 +3,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -168,7 +167,7 @@ public static class GPUSkinningBakerUtils
             string name = baker.name + (i + 1).ToString() + ".mat";
             Material material = CreateMaterial(baker.Materials[i], boneMap.height / 30, boneMap, bindposMap, animInfosMap);
             SaveAsset(CreateFolder(assetPath, "Materials"), name, material);
-            SaveAsPrefab(CreateFolder(assetPath), baker.name + ".prefab", sharedMesh, material);
+            SaveAsPrefab(CreateFolder(assetPath), $"{baker.name}_{i}.prefab", sharedMesh, material);
         }
     }
 
