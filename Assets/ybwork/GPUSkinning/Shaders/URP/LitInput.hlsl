@@ -21,12 +21,6 @@ sampler2D _BindposMap;
 float4 _BindposMap_TexelSize;
 sampler2D _AnimInfosMap;
 float4 _AnimInfosMap_TexelSize;
-bool _Loop;
-int _AnimIndex;
-float _CurrentTime;
-bool _LastAnimLoop;
-int _LastAnimIndex;
-float _LastAnimExitTime;
 
 float4 _BaseMap_ST;
 float4 _DetailAlbedoMap_ST;
@@ -48,7 +42,12 @@ CBUFFER_END
 
 UNITY_INSTANCING_BUFFER_START(Props)
 // put more per - instance properties here
-// UNITY_DEFINE_INSTANCED_PROP(float, _CurrentTime)
+UNITY_DEFINE_INSTANCED_PROP(int, _Loop)
+UNITY_DEFINE_INSTANCED_PROP(int, _AnimIndex)
+UNITY_DEFINE_INSTANCED_PROP(float, _CurrentTime)
+UNITY_DEFINE_INSTANCED_PROP(int, _LastAnimLoop)
+UNITY_DEFINE_INSTANCED_PROP(int, _LastAnimIndex)
+UNITY_DEFINE_INSTANCED_PROP(float, _LastAnimExitTime)
 UNITY_INSTANCING_BUFFER_END(Props)
 
 // NOTE: Do not ifdef the properties for dots instancing, but ifdef the actual usage.
