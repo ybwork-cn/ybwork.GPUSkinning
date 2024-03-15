@@ -59,13 +59,6 @@ public class GPUSkinningComponent : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Keypad1))
-            GpuSkinningData.SwitchState(0, true);
-        if (Input.GetKeyDown(KeyCode.Keypad2))
-            GpuSkinningData.SwitchState(1, true);
-        if (Input.GetKeyDown(KeyCode.Keypad3))
-            GpuSkinningData.SwitchState(2, false);
-
         GpuSkinningData.Update(Time.deltaTime);
     }
 }
