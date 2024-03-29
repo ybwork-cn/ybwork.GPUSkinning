@@ -18,6 +18,19 @@ public class GPUSkinningData
         this._material = material;
     }
 
+    public void Start()
+    {
+        CurrentTime = 0;
+
+        _material.SetFloat("_Loop", Loop ? 1 : 0);
+        _material.SetFloat("_AnimIndex", AnimIndex);
+        _material.SetFloat("_CurrentTime", CurrentTime);
+
+        _material.SetFloat("_LastAnimLoop", LastAnimLoop ? 1 : 0);
+        _material.SetFloat("_LastAnimIndex", LastAnimIndex);
+        _material.SetFloat("_LastAnimExitTime", LastAnimExitTime);
+    }
+
     public void SwitchState(int state, bool loop)
     {
         LastAnimLoop = Loop;
@@ -48,17 +61,21 @@ public class GPUSkinningComponent : MonoBehaviour
     Material _material;
 
     [SerializeField] GPUSkinningData _gpuSkinningData;
-    public GPUSkinningData GpuSkinningData => _gpuSkinningData;
 
     private void Awake()
     {
         _material = GetComponent<MeshRenderer>().material;
         _gpuSkinningData = new GPUSkinningData(_material);
-        GpuSkinningData.SwitchState(0, true);
+        _gpuSkinningData.Start();
     }
 
     private void Update()
     {
-        GpuSkinningData.Update(Time.deltaTime);
+        _gpuSkinningData.Update(Time.deltaTime);
+    }
+
+    public void SwitchState(int state, bool loop)
+    {
+        _gpuSkinningData.SwitchState(state, loop);
     }
 }
