@@ -1,0 +1,168 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: H_dzb_m
+  m_Shader: {fileID: 4800000, guid: 150a628702b7d6c43a51955445813394, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 2800000, guid: 9ca4edbf786efc14d83d5fe0bdf92b3e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ColorDecalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DecalMap1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DecalMap2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DecalMap3:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DecalMap4:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DecalMap5:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FalloffMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _HollowMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _InterferenceMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MakeupMap:
+        m_Texture: {fileID: 2800000, guid: de0b0122d1729144b9a92b14b55efbd6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NoiseMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RampMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RimLightMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecularMap:
+        m_Texture: {fileID: 2800000, guid: 58dd9efb7d5a69a44aea3b825db3f621, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AdditionlightsMode: 0
+    - _Alpha: 0
+    - _CullMode: 0
+    - _Cutoff: 0.5
+    - _DecalScale1: 1
+    - _DecalScale2: 1
+    - _DecalScale3: 1
+    - _DecalScale4: 1
+    - _DecalScale5: 1
+    - _DecalsMakeupScale2: 0
+    - _Dissolve: 0.374
+    - _DissolveEdgeScale: 0.25
+    - _EdgeThickness: 1
+    - _EdgeVertexControlThickness: 1
+    - _FalloffScale: 1
+    - _HSpecularPower: 0
+    - _HSpecularScale: 0
+    - _InterferencePower: 3
+    - _InterferenceScale: 2
+    - _MakeupLimit2: 0.8403
+    - _MakeupPower2: 1
+    - _MakeupRangeSize: 4.32
+    - _MakeupRateofChange: 0.59
+    - _MetallicHorizontalSpeeed: 0
+    - _MetallicVerticalSpeeed: 0
+    - _NewMetallic: 0
+    - _NormalScale: 1
+    - _RampScale: 1
+    - _RimLightScale: 0.3
+    - _SpecularMultiply: 7.3
+    - _SpecularPower: 16.54
+    - _SpecularScale: 0
+    - _StencilComp: 8
+    - _StencilNo: 1
+    - _StencilOpFail: 0
+    - _StencilOpPass: 0
+    - _lightLerp: 0
+    m_Colors:
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _ChannelMask: {r: 0, g: 0, b: 0, a: 0}
+    - _ColorDecalA: {r: 1, g: 1, b: 1, a: 1}
+    - _ColorDecalB: {r: 1, g: 1, b: 1, a: 1}
+    - _ColorDecalG: {r: 1, g: 1, b: 1, a: 1}
+    - _ColorDecalR: {r: 1, g: 1, b: 1, a: 1}
+    - _DecalColor1: {r: 1, g: 1, b: 1, a: 1}
+    - _DecalColor2: {r: 1, g: 1, b: 1, a: 1}
+    - _DecalColor3: {r: 1, g: 1, b: 1, a: 1}
+    - _DecalColor4: {r: 1, g: 1, b: 1, a: 1}
+    - _DecalColor5: {r: 1, g: 1, b: 1, a: 1}
+    - _DecalsMakeupColor2: {r: 1, g: 1, b: 1, a: 1}
+    - _DissolveEdgeColor: {r: 0, g: 0, b: 0, a: 1}
+    - _EdgeColor: {r: 0, g: 0, b: 0, a: 1}
+    - _MetallicColor: {r: 0, g: 0, b: 0, a: 1}
+    - _ShadowColor: {r: 1, g: 1, b: 1, a: 1}
+    - _SrcColor: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []
+--- !u!114 &2293606606993123680
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 2

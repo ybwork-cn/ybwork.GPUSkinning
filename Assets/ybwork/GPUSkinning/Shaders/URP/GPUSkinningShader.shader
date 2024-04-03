@@ -1,6 +1,6 @@
-﻿// Created by 月北(ybwork) https :// github.com / ybwork - cn/
+﻿// Created by 月北(ybwork) https://github.com/ybwork-cn/
 
-Shader "ybwork/URP/GPUSkinningShader"
+Shader "ybwork/GPUSkinningShader/URP"
 {
     Properties
     {
