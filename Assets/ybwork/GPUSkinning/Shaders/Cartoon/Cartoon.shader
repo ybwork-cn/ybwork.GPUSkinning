@@ -4,6 +4,19 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
 {
     Properties
     {
+        _BoneMap("Bone Map", 2D) = "white" {}
+        _BindposMap("Bindpos Map", 2D) = "white" {}
+        _AnimInfosMap("Anim Infos Map", 2D) = "white" {}
+
+        [ToggleUI] _Loop("Loop", Float) = 0
+        _AnimIndex("Anim Index", Int) = 0
+        _CurrentTime("Current Time", Float) = 0
+
+        [ToggleUI] _LastAnimLoop("Last Anim Loop", Float) = 0
+        _LastAnimIndex("Last Anim Index", Int) = 0
+        _LastAnimExitTime("Last Anim Exit Time", Float) = 0
+
+        [Space(30)]
         _ChannelMask("Channel Mask(0-255)", vector) = (0, 0, 0, 0)
         [Enum(OFF, 0, FRONT, 1, BACK, 2)] _CullMode("Cull Mode", int) = 0// OFF/FRONT/BACK
         [Enum(NO, 0, OFF, 1)] _Alpha("Use Alpha", int) = 0
@@ -64,46 +77,12 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
         }
 
         HLSLINCLUDE
-        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
-        CBUFFER_START(UnityPerMaterial)
-        float4 _BaseColor;
-        float4 _BaseMap_ST;
-        float4 _ShadowColor;
-        float4 _SpecularMap_ST;
-        float _EdgeThickness = 1.0;
-        float _EdgeVertexControlThickness;
-        float4 _EdgeColor;
+        #include "LitInput.hlsl"
+        #include "MyInclude.hlsl"
 
-        float _FalloffScale;
-        float _RampScale;
-
-        float _RimLightScale;
-        float _NormalScale;
-        float _SpecularPower;
-        float _SpecularMultiply;
-        float _Cutoff;
-
-        float4 _MakeupMap_ST;
-        float _MakeupRangeSize;
-        float _MakeupRateofChange;
-
-        float _DecalScale1;
-        float4 _DecalColor1;
-        float _DecalsMakeupScale1;
-        float4 _DecalsMakeupColor1;
-        float _MakeupPower1;
-        float _MakeupLimit1;
-
-        float _InterferencePower;
-        float _InterferenceScale;
-
-        float _AdditionlightsMode;
-
-        float4 _ChannelMask;
-        float _Alpha;
-        CBUFFER_END
         ENDHLSL
+
         Pass
         {
             Name "Skin"
@@ -144,8 +123,10 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
                 float2 uv : TEXCOORD0;
                 float2 uv2 : TEXCOORD1;
                 float4 color : COLOR;
-                float4 normalOS : NORMAL;
+                float3 normalOS : NORMAL;
                 float4 tangentOS : TANGENT;
+                float4 blendWeights : BLENDWEIGHTS;
+                uint4 blendIndices : BLENDINDICES;
             };
 
             struct Varyings
@@ -198,6 +179,8 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
+
+                GetPositionAndNormal(IN.positionOS, IN.normalOS, IN.blendIndices, IN.blendWeights);
 
                 VertexPositionInputs positionInputs = GetVertexPositionInputs(IN.positionOS.xyz);
                 OUT.positionCS = positionInputs.positionCS;
@@ -340,7 +323,9 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
                 float2 uv : TEXCOORD0;
                 float2 uv2 : TEXCOORD1;
                 float4 color : COLOR;
-                float4 normalOS : NORMAL;
+                float3 normalOS : NORMAL;
+                float4 blendWeights : BLENDWEIGHTS;
+                uint4 blendIndices : BLENDINDICES;
             };
 
             struct Varyings
@@ -376,6 +361,8 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
                 Varyings OUT;
                 float4 nearUpperRight = mul(unity_CameraInvProjection, float4(1, 1, UNITY_NEAR_CLIP_VALUE, _ProjectionParams.y));
                 float aspect = abs(nearUpperRight.y / nearUpperRight.x);
+
+                GetPositionAndNormal(IN.positionOS, IN.normalOS, IN.blendIndices, IN.blendWeights);
 
                 VertexPositionInputs positionInputs = GetVertexPositionInputs(IN.positionOS.xyz);
                 float4 projSpacePos = positionInputs.positionCS;
@@ -420,47 +407,53 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
         Pass
         {
             Name "ShadowCaster"
-
             Tags
             {
                 "LightMode" = "ShadowCaster"
             }
 
-            Cull Off
+            // -------------------------------------
+            // Render State Commands
             ZWrite On
             ZTest LEqual
             ColorMask 0
+            Cull[_Cull]
 
             HLSLPROGRAM
-            // Required to compile gles 2.0 with standard srp library
-            #pragma prefer_hlslcc gles
-            #pragma exclude_renderers d3d11_9x gles
-            // #pragma target 4.5
+            #pragma target 2.0
 
-            // Material Keywords
-            #pragma shader_feature _ALPHATEST_ON
-            #pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-
-            // GPU Instancing
-            #pragma multi_compile_instancing
-            #pragma multi_compile _ DOTS_INSTANCING_ON
-
+            // -------------------------------------
+            // Shader Stages
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
 
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 
-            float3 _LightDirection;
+            // --------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
 
-            TEXTURE2D(_NoiseMap); SAMPLER(sampler_NoiseMap);
+            // -------------------------------------
+            // Universal Pipeline keywords
+
+            // -------------------------------------
+            // Unity defined keywords
+            #pragma multi_compile_fragment _ LOD_FADE_CROSSFADE
+
+            // This is used during shadow map generation to differentiate between directional and punctual light shadows, as they use different formulas to apply Normal Bias
+            #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
 
             struct Attributes
             {
                 float4 positionOS : POSITION;
                 float3 normalOS : NORMAL;
                 float2 texcoord : TEXCOORD0;
+                float4 blendWeights : BLENDWEIGHTS;
+                uint4 blendIndices : BLENDINDICES;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -469,6 +462,12 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
                 float2 uv : TEXCOORD0;
                 float4 positionCS : SV_POSITION;
             };
+
+            float3 _LightDirection;
+            TEXTURE2D(_BaseMap);
+            SAMPLER(sampler_BaseMap);
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
 
             float4 GetShadowPositionHClip(Attributes input)
             {
@@ -486,20 +485,20 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
                 return positionCS;
             }
 
-            Varyings ShadowPassVertex(Attributes input)
+            Varyings ShadowPassVertex(Attributes IN)
             {
                 Varyings output;
-                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_SETUP_INSTANCE_ID(IN);
 
-                output.uv = TRANSFORM_TEX(input.texcoord, _BaseMap);
-                output.positionCS = GetShadowPositionHClip(input);
+                GetPositionAndNormal(IN.positionOS, IN.normalOS, IN.blendIndices, IN.blendWeights);
+
+                output.uv = TRANSFORM_TEX(IN.texcoord, _BaseMap);
+                output.positionCS = GetShadowPositionHClip(IN);
                 return output;
             }
 
             half4 ShadowPassFragment(Varyings input) : SV_TARGET
             {
-                half4 baseMap = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.uv);
-                clip(baseMap.a - _Cutoff);
                 return 0;
             }
 
@@ -531,7 +530,9 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
                 float2 uv : TEXCOORD0;
                 float2 uv2 : TEXCOORD1;
                 float4 color : COLOR;
-                float4 normalOS : NORMAL;
+                float3 normalOS : NORMAL;
+                float4 blendWeights : BLENDWEIGHTS;
+                uint4 blendIndices : BLENDINDICES;
             };
 
             struct Varyings
@@ -567,6 +568,8 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
                 Varyings OUT;
                 float4 nearUpperRight = mul(unity_CameraInvProjection, float4(1, 1, UNITY_NEAR_CLIP_VALUE, _ProjectionParams.y));
                 float aspect = abs(nearUpperRight.y / nearUpperRight.x);
+
+                GetPositionAndNormal(IN.positionOS, IN.normalOS, IN.blendIndices, IN.blendWeights);
 
                 VertexPositionInputs positionInputs = GetVertexPositionInputs(IN.positionOS.xyz);
                 float4 projSpacePos = positionInputs.positionCS;

@@ -1,3 +1,5 @@
+// Created by 月北(ybwork) https://github.com/ybwork-cn/
+
 TEXTURE2D(_GlobalAdditionLightsRampMap); SAMPLER(sampler_GlobalAdditionLightsRampMap);
 
 half CartoonAdditionalLightRealtimeShadow(int lightIndex, float3 positionWS, half3 lightDirection)

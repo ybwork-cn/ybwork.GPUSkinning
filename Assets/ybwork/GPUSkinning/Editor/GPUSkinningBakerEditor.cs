@@ -87,22 +87,42 @@ public readonly struct AnimInfo
 
 public static class GPUSkinningBakerUtils
 {
-    private static Shader URPShader => Shader.Find("ybwork/URP/GPUSkinningShader");
+    private static Shader URPShader => Shader.Find("ybwork/GPUSkinningShader/URP");
+    private static Shader CartoonShader => Shader.Find("ybwork/GPUSkinningShader/Cartoon");
     private static int BoneMapProp => Shader.PropertyToID("_BoneMap");
     private static int BindposMapProp => Shader.PropertyToID("_BindposMap");
     private static int AnimInfosMapProp => Shader.PropertyToID("_AnimInfosMap");
     private static int FullAnimLenProp => Shader.PropertyToID("_FullAnimLen");
 
     // 在文件夹上添加右键菜单项
-    [MenuItem("Assets/GPUSkinningBaker/SaveAll", true, 30)]
-    public static bool IsValidFolderSelection()
+    [MenuItem("Assets/GPUSkinningBaker/SaveAll-URP", true, 30)]
+    public static bool IsValidFolderSelection_URP()
     {
         // 检查当前所选的是不是文件夹
         return AssetDatabase.IsValidFolder(AssetDatabase.GetAssetPath(Selection.activeObject));
     }
 
-    [MenuItem("Assets/GPUSkinningBaker/SaveAll", false, 30)]
-    public static void PerformCustomAction()
+    [MenuItem("Assets/GPUSkinningBaker/SaveAll-URP", false, 30)]
+    public static void PerformCustomAction_URP()
+    {
+        PerformCustomAction(URPShader);
+    }
+
+    // 在文件夹上添加右键菜单项
+    [MenuItem("Assets/GPUSkinningBaker/SaveAll-Cartoon", true, 30)]
+    public static bool IsValidFolderSelection_Cartoon()
+    {
+        // 检查当前所选的是不是文件夹
+        return AssetDatabase.IsValidFolder(AssetDatabase.GetAssetPath(Selection.activeObject));
+    }
+
+    [MenuItem("Assets/GPUSkinningBaker/SaveAll-Cartoon", false, 30)]
+    public static void PerformCustomAction_Cartoon()
+    {
+        PerformCustomAction(CartoonShader);
+    }
+
+    public static void PerformCustomAction(Shader shader)
     {
         // 处理右键菜单的逻辑
         string folderPath = AssetDatabase.GetAssetPath(Selection.activeObject);
@@ -124,7 +144,7 @@ public static class GPUSkinningBakerUtils
         {
             (string assetPath, GPUSkinningBaker baker) = bakers[i];
             EditorUtility.DisplayProgressBar("Baking", "Baking GPUSkinningMap " + assetPath, (float)i / bakers.Count);
-            Save(assetPath, baker);
+            Save(assetPath, baker, shader);
             Object.DestroyImmediate(baker.gameObject);
             Debug.Log("生成完成:" + assetPath);
         }
@@ -148,7 +168,7 @@ public static class GPUSkinningBakerUtils
         return mesh;
     }
 
-    private static void Save(string assetPath, GPUSkinningBaker baker)
+    private static void Save(string assetPath, GPUSkinningBaker baker, Shader shader)
     {
         Texture2D boneMap = BakeBoneMap(baker, out List<AnimInfo> animInfos);
         SaveAsset(CreateFolder(assetPath, "Textures"), "boneMap.asset", boneMap);
@@ -165,7 +185,7 @@ public static class GPUSkinningBakerUtils
         for (int i = 0; i < baker.Materials.Count; i++)
         {
             string name = baker.name + (i + 1).ToString() + ".mat";
-            Material material = CreateMaterial(baker.Materials[i], boneMap.height / 30, boneMap, bindposMap, animInfosMap);
+            Material material = CreateMaterial(baker.Materials[i], boneMap.height / 30, boneMap, bindposMap, animInfosMap, shader);
             SaveAsset(CreateFolder(assetPath, "Materials"), name, material);
             SaveAsPrefab(CreateFolder(assetPath), $"{baker.name}_{i}.prefab", sharedMesh, material);
         }
@@ -280,9 +300,9 @@ public static class GPUSkinningBakerUtils
     }
 
     private static Material CreateMaterial(Material sourceMaterial, float fullAnimLen,
-        Texture2D boneMap, Texture2D bindposMap, Texture2D animInfosMap)
+        Texture2D boneMap, Texture2D bindposMap, Texture2D animInfosMap, Shader shader)
     {
-        var material = new Material(URPShader);
+        var material = new Material(shader);
         material.CopyMatchingPropertiesFromMaterial(sourceMaterial);
         material.SetTexture(BoneMapProp, boneMap);
         material.SetTexture(BindposMapProp, bindposMap);
