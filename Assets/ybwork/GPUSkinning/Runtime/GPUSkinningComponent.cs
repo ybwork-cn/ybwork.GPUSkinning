@@ -11,24 +11,26 @@ public class GPUSkinningData
     public int LastAnimIndex;
     public float LastAnimExitTime;
 
-    private readonly Material _material;
+    private readonly Renderer _renderer;
+    private readonly MaterialPropertyBlock _propBlock = new();
 
-    public GPUSkinningData(Material material)
+    public GPUSkinningData(Renderer renderer)
     {
-        this._material = material;
+        _renderer = renderer;
+        _renderer.GetPropertyBlock(_propBlock);
     }
 
     public void Start()
     {
         CurrentTime = 0;
 
-        _material.SetFloat("_Loop", Loop ? 1 : 0);
-        _material.SetFloat("_AnimIndex", AnimIndex);
-        _material.SetFloat("_CurrentTime", CurrentTime);
+        _propBlock.SetFloat("_Loop", Loop ? 1 : 0);
+        _propBlock.SetFloat("_AnimIndex", AnimIndex);
+        _propBlock.SetFloat("_CurrentTime", CurrentTime);
 
-        _material.SetFloat("_LastAnimLoop", LastAnimLoop ? 1 : 0);
-        _material.SetFloat("_LastAnimIndex", LastAnimIndex);
-        _material.SetFloat("_LastAnimExitTime", LastAnimExitTime);
+        _propBlock.SetFloat("_LastAnimLoop", LastAnimLoop ? 1 : 0);
+        _propBlock.SetFloat("_LastAnimIndex", LastAnimIndex);
+        _propBlock.SetFloat("_LastAnimExitTime", LastAnimExitTime);
     }
 
     public void SwitchState(int state, bool loop)
@@ -40,32 +42,30 @@ public class GPUSkinningData
         AnimIndex = state;
         CurrentTime = 0;
 
-        _material.SetFloat("_Loop", Loop ? 1 : 0);
-        _material.SetFloat("_AnimIndex", AnimIndex);
-        _material.SetFloat("_CurrentTime", CurrentTime);
+        _propBlock.SetFloat("_Loop", Loop ? 1 : 0);
+        _propBlock.SetFloat("_AnimIndex", AnimIndex);
+        _propBlock.SetFloat("_CurrentTime", CurrentTime);
 
-        _material.SetFloat("_LastAnimLoop", LastAnimLoop ? 1 : 0);
-        _material.SetFloat("_LastAnimIndex", LastAnimIndex);
-        _material.SetFloat("_LastAnimExitTime", LastAnimExitTime);
+        _propBlock.SetFloat("_LastAnimLoop", LastAnimLoop ? 1 : 0);
+        _propBlock.SetFloat("_LastAnimIndex", LastAnimIndex);
+        _propBlock.SetFloat("_LastAnimExitTime", LastAnimExitTime);
     }
 
     public void Update(float deltaTime)
     {
         CurrentTime += deltaTime;
-        _material.SetFloat("_CurrentTime", CurrentTime);
+        _propBlock.SetFloat("_CurrentTime", CurrentTime);
+        _renderer.SetPropertyBlock(_propBlock);
     }
 }
 
 public class GPUSkinningComponent : MonoBehaviour
 {
-    Material _material;
-
     [SerializeField] GPUSkinningData _gpuSkinningData;
 
     private void Awake()
     {
-        _material = GetComponent<MeshRenderer>().material;
-        _gpuSkinningData = new GPUSkinningData(_material);
+        _gpuSkinningData = new GPUSkinningData(GetComponent<MeshRenderer>());
         _gpuSkinningData.Start();
     }
 

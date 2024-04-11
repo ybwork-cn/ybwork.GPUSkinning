@@ -73,8 +73,12 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
     {
         Tags
         {
-            "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline"
+            "RenderType" = "Opaque"
+            "RenderPipeline" = "UniversalPipeline"
+            "UniversalMaterialType" = "Lit"
+            "IgnoreProjector" = "True"
         }
+        LOD 300
 
         HLSLINCLUDE
 
@@ -95,6 +99,7 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
             ZWrite On
             Cull[_CullMode]
             Blend SrcAlpha OneMinusSrcAlpha
+
             Stencil
             {
                 Ref[_StencilNo]
@@ -104,17 +109,16 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
             }
 
             HLSLPROGRAM
+            #pragma target 2.0
+
             #pragma vertex vert
             #pragma fragment frag
-
-            // Feature
-            // #pragma shader_feature _ _CARTOON_ADDITIONLIGHTS_ON
-            // Constants
-            // #define FALLOFF_POWER 0.3//1.0
 
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _SHADOWS_SOFT
+            #pragma multi_compile_instancing
+            #pragma instancing_options renderinglayer
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
             struct Attributes
@@ -127,6 +131,7 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
                 float4 tangentOS : TANGENT;
                 float4 blendWeights : BLENDWEIGHTS;
                 uint4 blendIndices : BLENDINDICES;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct Varyings
@@ -140,9 +145,10 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
                 float3 tangentWS : TEXCOORD4;
                 float3 bitangentWS : TEXCOORD5;
                 float2 uv2 : TEXCOORD6;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+                UNITY_VERTEX_OUTPUT_STEREO
             };
 
-            TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
             TEXTURE2D(_FalloffMap); SAMPLER(sampler_FalloffMap);
             TEXTURE2D(_RampMap); SAMPLER(sampler_RampMap);
             TEXTURE2D(_RimLightMap); SAMPLER(sampler_RimLightMap);
@@ -153,11 +159,6 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
 
             #include "CartoonAdditionLight.hlsl"
 
-            half3 SampleNormal(float2 uv, TEXTURE2D_PARAM(bumpMap, sampler_bumpMap), half scale = 1.0h)
-            {
-                half4 n = SAMPLE_TEXTURE2D(bumpMap, sampler_bumpMap, uv);
-                return UnpackNormalScale(n, scale);
-            }
             // This function was added in URP v9.x.x versions
             // If we want to support URP versions before, we need to handle it instead.
             // Computes the world space view direction (pointing towards the viewer).
@@ -179,6 +180,10 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
+
+                UNITY_SETUP_INSTANCE_ID(IN);
+                UNITY_TRANSFER_INSTANCE_ID(IN, OUT);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
 
                 GetPositionAndNormal(IN.positionOS, IN.normalOS, IN.blendIndices, IN.blendWeights);
 
@@ -298,8 +303,7 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
                 "LightMode" = "SRPDefaultUnlit"
             }
 
-            Cull Front// [_SRPDefaultUnlitColMode]
-            // ColorMask [_SPRDefaultUnlitColorMask]
+            Cull Front
             Blend SrcAlpha OneMinusSrcAlpha
             Stencil
             {
@@ -307,11 +311,12 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
                 Comp[_StencilComp]
                 Pass[_StencilOpPass]
                 Fail[_StencilOpFail]
-
             }
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma multi_compile_instancing
+            #pragma instancing_options renderinglayer
             // Outline thickness multiplier
             #define INV_EDGE_THICKNESS_DIVISOR 0.01
             // Outline color parameters
@@ -326,6 +331,7 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
                 float3 normalOS : NORMAL;
                 float4 blendWeights : BLENDWEIGHTS;
                 uint4 blendIndices : BLENDINDICES;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct Varyings
@@ -333,10 +339,9 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
                 float4 positionCS : SV_POSITION;
                 float2 uv : TEXCOORD0;
                 float2 uv2 : TEXCOORD1;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+                UNITY_VERTEX_OUTPUT_STEREO
             };
-
-            TEXTURE2D(_BaseMap);
-            SAMPLER(sampler_BaseMap);
 
             // This function was added in URP v9.x.x versions
             // If we want to support URP versions before, we need to handle it instead.
@@ -359,6 +364,11 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
+
+                UNITY_SETUP_INSTANCE_ID(IN);
+                UNITY_TRANSFER_INSTANCE_ID(IN, OUT);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
+
                 float4 nearUpperRight = mul(unity_CameraInvProjection, float4(1, 1, UNITY_NEAR_CLIP_VALUE, _ProjectionParams.y));
                 float aspect = abs(nearUpperRight.y / nearUpperRight.x);
 
@@ -435,6 +445,7 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
             // --------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            #pragma instancing_options renderinglayer
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
 
             // -------------------------------------
@@ -464,8 +475,6 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
             };
 
             float3 _LightDirection;
-            TEXTURE2D(_BaseMap);
-            SAMPLER(sampler_BaseMap);
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
 
@@ -502,107 +511,6 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
                 return 0;
             }
 
-            ENDHLSL
-        }
-
-        Pass
-        {
-            Tags
-            {
-                "LightMode" = "FxRGBChannelMask"
-            }
-            ZWrite On
-            ZTest LEqual
-            Cull Off
-            ColorMask RA
-
-            HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            // Outline thickness multiplier
-            #define INV_EDGE_THICKNESS_DIVISOR 0.01
-            // Outline color parameters
-            #define SATURATION_FACTOR 0.6
-            #define BRIGHTNESS_FACTOR 0.8
-            struct Attributes
-            {
-                float4 positionOS : POSITION;
-                float2 uv : TEXCOORD0;
-                float2 uv2 : TEXCOORD1;
-                float4 color : COLOR;
-                float3 normalOS : NORMAL;
-                float4 blendWeights : BLENDWEIGHTS;
-                uint4 blendIndices : BLENDINDICES;
-            };
-
-            struct Varyings
-            {
-                float4 positionCS : SV_POSITION;
-                float2 uv : TEXCOORD0;
-                float2 uv2 : TEXCOORD1;
-            };
-
-            TEXTURE2D(_BaseMap);
-            SAMPLER(sampler_BaseMap);
-
-            // This function was added in URP v9.x.x versions
-            // If we want to support URP versions before, we need to handle it instead.
-            // Computes the world space view direction (pointing towards the viewer).
-            float3 ThisGetWorldSpaceViewDir(float3 positionWS)
-            {
-                if (unity_OrthoParams.w == 0)
-                {
-                    // Perspective
-                    return normalize(_WorldSpaceCameraPos - positionWS);
-                }
-                else
-                {
-                    // Orthographic
-                    float4x4 viewMat = GetWorldToViewMatrix();
-                    return viewMat[2].xyz;
-                }
-            }
-
-            Varyings vert(Attributes IN)
-            {
-                Varyings OUT;
-                float4 nearUpperRight = mul(unity_CameraInvProjection, float4(1, 1, UNITY_NEAR_CLIP_VALUE, _ProjectionParams.y));
-                float aspect = abs(nearUpperRight.y / nearUpperRight.x);
-
-                GetPositionAndNormal(IN.positionOS, IN.normalOS, IN.blendIndices, IN.blendWeights);
-
-                VertexPositionInputs positionInputs = GetVertexPositionInputs(IN.positionOS.xyz);
-                float4 projSpacePos = positionInputs.positionCS;
-
-                float3 viewNormal = mul((float3x3)UNITY_MATRIX_IT_MV, IN.normalOS.xyz);
-                float3 clipNormal = mul(viewNormal.xyz, (float3x3)UNITY_MATRIX_I_P);
-                float2 projectedNormal = normalize(clipNormal.xy);
-                projectedNormal.x *= aspect;
-
-                float2 scaledNormal = max(_EdgeVertexControlThickness, IN.color.r) * _EdgeThickness * INV_EDGE_THICKNESS_DIVISOR * projectedNormal;
-                OUT.positionCS = projSpacePos + float4(scaledNormal, -0.00001, 0);
-
-                OUT.uv = TRANSFORM_TEX(IN.uv, _BaseMap);
-                OUT.uv2 = TRANSFORM_TEX(IN.uv2, _BaseMap);
-                return OUT;
-            }
-
-            half4 frag(Varyings IN) : SV_Target
-            {
-                half4 baseMap = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv);
-                clip(baseMap.a - _Cutoff);
-
-                float maxChan = max(max(baseMap.r, baseMap.g), baseMap.b);
-                half4 newMapColor = baseMap;
-
-                maxChan -= (1.0 / 255.0);
-                float3 lerpVals = saturate((newMapColor.rgb - float3(maxChan, maxChan, maxChan)) * 255.0);
-                newMapColor.rgb = lerp(SATURATION_FACTOR * newMapColor.rgb, newMapColor.rgb, lerpVals);
-
-                half3 col = BRIGHTNESS_FACTOR * newMapColor.rgb * baseMap.rgb * _BaseColor;
-                col = lerp(col, _EdgeColor.rgb, _EdgeColor.a);
-                return half4(_ChannelMask.xyz / 255, _Alpha == 0 ? baseMap.a : 1);
-            }
             ENDHLSL
         }
     }
