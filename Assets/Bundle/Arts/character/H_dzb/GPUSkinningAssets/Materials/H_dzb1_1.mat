@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: H_dzb1
+  m_Name: H_dzb1_1
   m_Shader: {fileID: 4800000, guid: 150a628702b7d6c43a51955445813394, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0

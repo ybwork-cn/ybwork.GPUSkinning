@@ -1,21 +1,25 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using ybwork.Async;
 
 public class Test : MonoBehaviour
 {
+
     [SerializeField] GameObject _prefab;
-    // Start is called before the first frame update
+
     void Start()
     {
-        for (int i = 0; i < 30; i++)
+        Transform parent = new GameObject("Roles").transform;
+        for (int i = 0; i < 50; i++)
         {
-            for (int j = 0; j < 30; j++)
+            for (int j = 0; j < 50; j++)
             {
-                GameObject go = Instantiate(_prefab);
+                GameObject go = Instantiate(_prefab, parent);
                 go.transform.position = new Vector3(i, 0, j);
-                GPUSkinningComponent gpuSkinningComponent = go.GetComponent<GPUSkinningComponent>();
-                gpuSkinningComponent.SwitchState(Random.Range(0, 4), true);
+                GPUSkinningComponent gpuSkinningComponent = go.AddComponent<GPUSkinningComponent>();
+                YueTask.Delay(Random.value).Then(() =>
+                {
+                    gpuSkinningComponent.SwitchState(Random.Range(0, 4), true);
+                });
             }
         }
     }
