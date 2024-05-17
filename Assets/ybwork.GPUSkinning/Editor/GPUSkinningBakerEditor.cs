@@ -16,18 +16,18 @@ public readonly struct AnimData
     public readonly List<AnimationState> AnimationClips;
     public readonly string Name;
 
-    private readonly Animation Animation;
-    private readonly SkinnedMeshRenderer[] Skins;
+    private readonly Animation _animation;
+    private readonly SkinnedMeshRenderer[] _skins;
 
     public AnimData(GPUSkinningBaker baker)
     {
         Animation anim = baker.GetComponent<Animation>();
-        Skins = baker.GetComponentsInChildren<SkinnedMeshRenderer>();
+        _skins = baker.GetComponentsInChildren<SkinnedMeshRenderer>();
 
-        MapWidths = Skins.Select(render => render.bones.Length).ToArray();
+        MapWidths = _skins.Select(render => render.bones.Length).ToArray();
         MapWidth = Mathf.NextPowerOfTwo(MapWidths.Sum());
         AnimationClips = new List<AnimationState>(anim.Cast<AnimationState>());
-        Animation = anim;
+        _animation = anim;
         Name = baker.name;
     }
 
@@ -35,7 +35,7 @@ public readonly struct AnimData
 
     public readonly void AnimationPlay(string animName)
     {
-        Animation.Play(animName);
+        _animation.Play(animName);
     }
 
     public void SampleAnimAndBakeBoneMatrices(ref Matrix4x4[] boneMatrices)
@@ -46,19 +46,19 @@ public readonly struct AnimData
 
     private void SampleAnim()
     {
-        if (Animation == null)
+        if (_animation == null)
         {
             Debug.LogError("animation is null!!");
             return;
         }
 
-        Animation.Sample();
+        _animation.Sample();
     }
 
     private void BakeBoneMatrices(ref Matrix4x4[] boneMatrices)
     {
         int index = 0;
-        foreach (SkinnedMeshRenderer skin in Skins)
+        foreach (SkinnedMeshRenderer skin in _skins)
         {
             foreach (Transform bone in skin.bones)
             {

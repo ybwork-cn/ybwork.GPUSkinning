@@ -7,9 +7,9 @@ using UnityEngine;
 
 public class GPUSkinningShaderEditor : BaseShaderGUI
 {
-    private static readonly string[] workflowModeNames = Enum.GetNames(typeof(LitGUI.WorkflowMode));
-    private LitGUI.LitProperties litProperties;
-    private LitDetailGUI.DetailLitProperties litDetailProperties;
+    private static readonly string[] _workflowModeNames = Enum.GetNames(typeof(LitGUI.WorkflowMode));
+    private LitGUI.LitProperties _litProperties;
+    private LitDetailGUI.DetailLitProperties _litDetailProperties;
 
     public static readonly GUIContent boneMapTitle = EditorGUIUtility.TrTextContent("BoneMap");
     public static readonly GUIContent bindposMapTitle = EditorGUIUtility.TrTextContent("BindposMap");
@@ -35,15 +35,15 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
     {
         materialScopesList.RegisterHeaderScope(LitDetailGUI.Styles.detailInputs, Expandable.Details, delegate
         {
-            LitDetailGUI.DoDetailArea(litDetailProperties, base.materialEditor);
+            LitDetailGUI.DoDetailArea(_litDetailProperties, base.materialEditor);
         });
     }
 
     public override void FindProperties(MaterialProperty[] properties)
     {
         base.FindProperties(properties);
-        litProperties = new LitGUI.LitProperties(properties);
-        litDetailProperties = new LitDetailGUI.DetailLitProperties(properties);
+        _litProperties = new LitGUI.LitProperties(properties);
+        _litDetailProperties = new LitDetailGUI.DetailLitProperties(properties);
         BoneMapProp = FindProperty("_BoneMap", properties, propertyIsMandatory: false);
         BindposMapProp = FindProperty("_BindposMap", properties, propertyIsMandatory: false);
         AnimInfosMapProp = FindProperty("_AnimInfosMap", properties, propertyIsMandatory: false);
@@ -63,9 +63,9 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
     public override void DrawSurfaceOptions(Material material)
     {
         EditorGUIUtility.labelWidth = 0f;
-        if (litProperties.workflowMode != null)
+        if (_litProperties.workflowMode != null)
         {
-            DoPopup(LitGUI.Styles.workflowModeText, litProperties.workflowMode, workflowModeNames);
+            DoPopup(LitGUI.Styles.workflowModeText, _litProperties.workflowMode, _workflowModeNames);
         }
 
         base.DrawSurfaceOptions(material);
@@ -87,17 +87,17 @@ public class GPUSkinningShaderEditor : BaseShaderGUI
 
 
         base.DrawSurfaceInputs(material);
-        LitGUI.Inputs(litProperties, base.materialEditor, material);
+        LitGUI.Inputs(_litProperties, base.materialEditor, material);
         DrawEmissionProperties(material, keyword: true);
         BaseShaderGUI.DrawTileOffset(base.materialEditor, base.baseMapProp);
     }
 
     public override void DrawAdvancedOptions(Material material)
     {
-        if (litProperties.reflections != null && litProperties.highlights != null)
+        if (_litProperties.reflections != null && _litProperties.highlights != null)
         {
-            base.materialEditor.ShaderProperty(litProperties.highlights, LitGUI.Styles.highlightsText);
-            base.materialEditor.ShaderProperty(litProperties.reflections, LitGUI.Styles.reflectionsText);
+            base.materialEditor.ShaderProperty(_litProperties.highlights, LitGUI.Styles.highlightsText);
+            base.materialEditor.ShaderProperty(_litProperties.reflections, LitGUI.Styles.reflectionsText);
         }
 
         base.DrawAdvancedOptions(material);
