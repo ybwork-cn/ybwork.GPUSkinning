@@ -8,14 +8,6 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
         _BindposMap("Bindpos Map", 2D) = "white" {}
         _AnimInfosMap("Anim Infos Map", 2D) = "white" {}
 
-        [ToggleUI] _Loop("Loop", Float) = 0
-        _AnimIndex("Anim Index", Int) = 0
-        _CurrentTime("Current Time", Float) = 0
-
-        [ToggleUI] _LastAnimLoop("Last Anim Loop", Float) = 0
-        _LastAnimIndex("Last Anim Index", Int) = 0
-        _LastAnimExitTime("Last Anim Exit Time", Float) = 0
-
         [Space(30)]
         _ChannelMask("Channel Mask(0-255)", vector) = (0, 0, 0, 0)
         [Enum(OFF, 0, FRONT, 1, BACK, 2)] _CullMode("Cull Mode", int) = 0// OFF/FRONT/BACK
@@ -57,6 +49,10 @@ Shader "ybwork/GPUSkinningShader/Cartoon"
         _DecalMap1("Decal Map 1", 2D) = "black" {}
         _DecalScale1("Decal Alpha 1", Range(0, 1)) = 1
         _DecalColor1("Decal Color 1", Color) = (1, 1, 1, 1)
+        _DecalsMakeupScale1("Decals Makeup Scale 1", Range(0, 1)) = 1
+        _DecalsMakeupColor1("Decals Makeup Color 1", Color) = (1, 1, 1, 1)
+        _MakeupPower1("Makeup Power1 1", Float) = 0
+        _MakeupLimit1("Makeup Limit 1", Float) = 0
         // MakeupRange
         _MakeupRangeSize("MakeupRange Size", Range(1, 20)) = 2
         _MakeupRateofChange("Makeup Rate of Change", Range(0, 1)) = 0.5
