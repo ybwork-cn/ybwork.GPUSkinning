@@ -8,14 +8,6 @@ Shader "ybwork/GPUSkinningShader/URP"
         _BindposMap("Bindpos Map", 2D) = "white" {}
         _AnimInfosMap("Anim Infos Map", 2D) = "white" {}
 
-        [ToggleUI] _Loop("Loop", Float) = 0
-        _AnimIndex("Anim Index", Int) = 0
-        _CurrentTime("Current Time", Float) = 0
-
-        [ToggleUI] _LastAnimLoop("Last Anim Loop", Float) = 0
-        _LastAnimIndex("Last Anim Index", Int) = 0
-        _LastAnimExitTime("Last Anim Exit Time", Float) = 0
-
         // Specular vs Metallic workflow
         _WorkflowMode("WorkflowMode", Float) = 1.0
 

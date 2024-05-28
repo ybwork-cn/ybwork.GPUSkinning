@@ -8,14 +8,6 @@ Shader "ybwork/GPUSkinningShader/Cartoon-OutLine"
         _BindposMap("Bindpos Map", 2D) = "white" {}
         _AnimInfosMap("Anim Infos Map", 2D) = "white" {}
 
-        [ToggleUI] _Loop("Loop", Float) = 0
-        _AnimIndex("Anim Index", Int) = 0
-        _CurrentTime("Current Time", Float) = 0
-
-        [ToggleUI] _LastAnimLoop("Last Anim Loop", Float) = 0
-        _LastAnimIndex("Last Anim Index", Int) = 0
-        _LastAnimExitTime("Last Anim Exit Time", Float) = 0
-
         [Space(30)]
         _ChannelMask("Channel Mask(0-255)", vector) = (0, 0, 0, 0)
         [Enum(OFF, 0, FRONT, 1, BACK, 2)] _CullMode("Cull Mode", int) = 0// OFF/FRONT/BACK
