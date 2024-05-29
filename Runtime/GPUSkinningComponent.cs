@@ -31,6 +31,8 @@ public class GPUSkinningData
         _propBlock.SetFloat("_LastAnimLoop", LastAnimLoop ? 1 : 0);
         _propBlock.SetFloat("_LastAnimIndex", LastAnimIndex);
         _propBlock.SetFloat("_LastAnimExitTime", LastAnimExitTime);
+
+        _renderer.SetPropertyBlock(_propBlock);
     }
 
     public void SwitchState(int state, bool loop)
@@ -49,6 +51,8 @@ public class GPUSkinningData
         _propBlock.SetFloat("_LastAnimLoop", LastAnimLoop ? 1 : 0);
         _propBlock.SetFloat("_LastAnimIndex", LastAnimIndex);
         _propBlock.SetFloat("_LastAnimExitTime", LastAnimExitTime);
+
+        _renderer.SetPropertyBlock(_propBlock);
     }
 
     public void Update(float deltaTime)
