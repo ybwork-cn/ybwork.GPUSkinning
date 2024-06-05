@@ -3,7 +3,6 @@ using ybwork.Async;
 
 public class Test : MonoBehaviour
 {
-
     [SerializeField] GameObject _prefab;
 
     void Start()

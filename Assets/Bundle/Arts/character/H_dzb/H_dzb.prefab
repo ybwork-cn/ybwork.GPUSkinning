@@ -512,6 +512,10 @@ Animation:
   - {fileID: 7400000, guid: 8e1d8a016c997434dbff0fa160315c95, type: 2}
   - {fileID: 7400000, guid: d82dc64795618534696274687bd7ef77, type: 2}
   - {fileID: 7400000, guid: b30685a48057fca4594120b8cb88a3cd, type: 2}
+  - {fileID: 7400000, guid: 8e1d8a016c997434dbff0fa160315c95, type: 2}
+  - {fileID: 7400000, guid: 8e1d8a016c997434dbff0fa160315c95, type: 2}
+  - {fileID: 7400000, guid: 8e1d8a016c997434dbff0fa160315c95, type: 2}
+  - {fileID: 7400000, guid: 8e1d8a016c997434dbff0fa160315c95, type: 2}
   m_WrapMode: 0
   m_PlayAutomatically: 1
   m_AnimatePhysics: 0

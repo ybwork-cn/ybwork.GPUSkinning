@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1896023339899139337}
   - component: {fileID: 5829450903778626638}
   - component: {fileID: 665706456909991341}
+  - component: {fileID: 4190950272927196998}
   m_Layer: 0
   m_Name: H_dzb_0
   m_TagString: Untagged
@@ -84,3 +85,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &4190950272927196998
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 808663820367104855}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 539dae58a5fb0294b826b5c77935a3b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gpuSkinningData:
+    Loop: 0
+    AnimIndex: 0
+    CurrentTime: 0
+    LastAnimLoop: 0
+    LastAnimIndex: 0
+    LastAnimExitTime: 0

@@ -71,9 +71,7 @@ Material:
     m_Floats:
     - _AdditionlightsMode: 0
     - _Alpha: 0
-    - _AnimIndex: 0
     - _CullMode: 0
-    - _CurrentTime: 0
     - _Cutoff: 0.5
     - _DecalScale1: 1
     - _EdgeThickness: 1
@@ -81,10 +79,6 @@ Material:
     - _FalloffScale: 1
     - _InterferencePower: 3
     - _InterferenceScale: 2
-    - _LastAnimExitTime: 0
-    - _LastAnimIndex: 0
-    - _LastAnimLoop: 0
-    - _Loop: 0
     - _MakeupRangeSize: 4.32
     - _MakeupRateofChange: 0.59
     - _NormalScale: 1
