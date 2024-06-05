@@ -35,24 +35,23 @@ public readonly struct AnimData
 
     public readonly void AnimationPlay(string animName)
     {
-        _animation.Play(animName);
+        _animation.clip = _animation.GetClip(animName);
     }
 
-    public void SampleAnimAndBakeBoneMatrices(ref Matrix4x4[] boneMatrices)
+    public void SampleAnimAndBakeBoneMatrices(float time, ref Matrix4x4[] boneMatrices)
     {
-        SampleAnim();
+        SampleAnim(time);
         BakeBoneMatrices(ref boneMatrices);
     }
 
-    private void SampleAnim()
+    private void SampleAnim(float time)
     {
         if (_animation == null)
         {
             Debug.LogError("animation is null!!");
             return;
         }
-
-        _animation.Sample();
+        _animation.clip.SampleAnimation(_animation.gameObject, time);
     }
 
     private void BakeBoneMatrices(ref Matrix4x4[] boneMatrices)
@@ -280,7 +279,7 @@ public static class GPUSkinningBakerUtils
         for (var i = 0; i < animInfo.FrameCount; i++)
         {
             animInfo.AnimationState.time = sampleTime;
-            animData.SampleAnimAndBakeBoneMatrices(ref boneMatrices);
+            animData.SampleAnimAndBakeBoneMatrices(sampleTime, ref boneMatrices);
 
             for (int j = 0; j < boneMatrices.Length; j++)
             {
