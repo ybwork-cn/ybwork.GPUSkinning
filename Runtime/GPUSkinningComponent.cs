@@ -3,6 +3,7 @@
 [System.Serializable]
 public class GPUSkinningData
 {
+    public bool ForceUpdate;
     public bool Loop;
     public int AnimIndex;
     public float CurrentTime;
@@ -57,6 +58,16 @@ public class GPUSkinningData
 
     public void Update(float deltaTime)
     {
+        if (Application.isEditor && ForceUpdate)
+        {
+            _propBlock.SetFloat("_Loop", Loop ? 1 : 0);
+            _propBlock.SetFloat("_AnimIndex", AnimIndex);
+
+            _propBlock.SetFloat("_LastAnimLoop", LastAnimLoop ? 1 : 0);
+            _propBlock.SetFloat("_LastAnimIndex", LastAnimIndex);
+            _propBlock.SetFloat("_LastAnimExitTime", LastAnimExitTime);
+        }
+
         CurrentTime += deltaTime;
         _propBlock.SetFloat("_CurrentTime", CurrentTime);
         _renderer.SetPropertyBlock(_propBlock);
