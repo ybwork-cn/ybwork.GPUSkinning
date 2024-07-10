@@ -76,6 +76,7 @@ public class GPUSkinningData
 
 public class GPUSkinningComponent : MonoBehaviour
 {
+    [SerializeField] float _speed = 1;
     [SerializeField] GPUSkinningData _gpuSkinningData;
 
     private void Awake()
@@ -86,7 +87,7 @@ public class GPUSkinningComponent : MonoBehaviour
 
     private void Update()
     {
-        _gpuSkinningData.Update(Time.deltaTime);
+        _gpuSkinningData.Update(Time.deltaTime * _speed);
     }
 
     public void SwitchState(int state, bool loop)
