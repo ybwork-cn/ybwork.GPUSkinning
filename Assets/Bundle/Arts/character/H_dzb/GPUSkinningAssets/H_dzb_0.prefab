@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5829450903778626638}
   - component: {fileID: 665706456909991341}
   - component: {fileID: 4190950272927196998}
+  - component: {fileID: 6782648639503385120}
   m_Layer: 0
   m_Name: H_dzb_0
   m_TagString: Untagged
@@ -97,10 +98,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 539dae58a5fb0294b826b5c77935a3b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _speed: 1
   _gpuSkinningData:
+    ForceUpdate: 0
     Loop: 0
     AnimIndex: 0
     CurrentTime: 0
     LastAnimLoop: 0
     LastAnimIndex: 0
     LastAnimExitTime: 0
+--- !u!114 &6782648639503385120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 808663820367104855}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20fcadf79ee93e2419bd7e5fc4798d64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AnimaitonLengths:
+  - 1.1333334
+  - 0.6666667
+  - 0.6666667
+  - 1.1333334
+  - 0.6666667
+  - 0.6666667
+  - 0.6666667
+  - 0.6666667

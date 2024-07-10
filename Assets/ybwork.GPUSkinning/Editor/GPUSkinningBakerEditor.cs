@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// 保存需要烘焙的动画的相关数据
@@ -74,12 +75,14 @@ public readonly struct AnimInfo
 {
     public readonly int StartFrame;
     public readonly int FrameCount;
+    public readonly float Length;
     public readonly AnimationState AnimationState;
 
     public AnimInfo(AnimationState animationState, int startFrame)
     {
         StartFrame = startFrame;
         FrameCount = (int)(animationState.clip.frameRate * animationState.length + 1);
+        Length = animationState.length;
         AnimationState = animationState;
     }
 }
@@ -191,7 +194,7 @@ public static class GPUSkinningBakerUtils
                 string name = $"{baker.name}{i + 1}_{j + 1}.mat";
                 SaveAsset(CreateFolder(assetPath, "Materials"), name, material);
             }
-            SaveAsPrefab(CreateFolder(assetPath), $"{baker.name}_{i}.prefab", sharedMesh, materials);
+            SaveAsPrefab(CreateFolder(assetPath), $"{baker.name}_{i}.prefab", sharedMesh, materials, animInfos);
         }
     }
 
@@ -321,7 +324,7 @@ public static class GPUSkinningBakerUtils
             .ToArray();
     }
 
-    private static void SaveAsPrefab(string path, string filename, Mesh mesh, Material[] materials)
+    private static void SaveAsPrefab(string path, string filename, Mesh mesh, Material[] materials, List<AnimInfo> animInfos)
     {
         filename = Path.Combine(path, filename);
         GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(filename);
@@ -330,6 +333,7 @@ public static class GPUSkinningBakerUtils
             var go = new GameObject();
             go.AddComponent<MeshFilter>().sharedMesh = mesh;
             go.AddComponent<MeshRenderer>().sharedMaterials = materials;
+            go.AddComponent<GPUSkinningInfo>().AnimaitonLengths = animInfos.Select(info => info.Length).ToArray();
             PrefabUtility.SaveAsPrefabAsset(go, filename);
             Object.DestroyImmediate(go);
         }
@@ -342,6 +346,10 @@ public static class GPUSkinningBakerUtils
             if (!prefab.TryGetComponent(out MeshRenderer meshRenderer))
                 meshRenderer = prefab.AddComponent<MeshRenderer>();
             meshRenderer.sharedMaterials = materials;
+
+            if (!prefab.TryGetComponent(out GPUSkinningInfo gpuSkinningInfo))
+                gpuSkinningInfo = prefab.AddComponent<GPUSkinningInfo>();
+            gpuSkinningInfo.AnimaitonLengths = animInfos.Select(info => info.Length).ToArray();
 
             PrefabUtility.SaveAsPrefabAsset(prefab, filename);
         }

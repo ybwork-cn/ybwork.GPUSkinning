@@ -17,7 +17,7 @@ public class Test : MonoBehaviour
                 GPUSkinningComponent gpuSkinningComponent = go.AddComponent<GPUSkinningComponent>();
                 YueTask.Delay(Random.value * 100).Then(() =>
                 {
-                    gpuSkinningComponent.SwitchState(Random.Range(0, 4), true);
+                    gpuSkinningComponent.SwitchState(Random.Range(0, 4));
                 });
             }
         }
