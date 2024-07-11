@@ -1,0 +1,103 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: H_dzb1_1
+  m_Shader: {fileID: 4800000, guid: 150a628702b7d6c43a51955445813394, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _AnimInfosMap:
+        m_Texture: {fileID: 2800000, guid: 448e168c0ace7464bbec328f710f96e2, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BaseMap:
+        m_Texture: {fileID: 2800000, guid: 9ca4edbf786efc14d83d5fe0bdf92b3e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BindposMap:
+        m_Texture: {fileID: 2800000, guid: 906e726f226b5544fae45a032c3859d9, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BoneMap:
+        m_Texture: {fileID: 2800000, guid: 6c5da8c0a9da6954183714a46f41654a, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DecalMap1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FalloffMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MakeupMap:
+        m_Texture: {fileID: 2800000, guid: de0b0122d1729144b9a92b14b55efbd6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RampMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RimLightMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecularMap:
+        m_Texture: {fileID: 2800000, guid: 58dd9efb7d5a69a44aea3b825db3f621, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AdditionlightsMode: 0
+    - _Alpha: 0
+    - _CullMode: 0
+    - _Cutoff: 0.5
+    - _DecalScale1: 1
+    - _DecalsMakeupScale1: 1
+    - _EdgeThickness: 1
+    - _EdgeVertexControlThickness: 1
+    - _FalloffScale: 1
+    - _InterferencePower: 3
+    - _InterferenceScale: 2
+    - _MakeupLimit1: 0
+    - _MakeupPower1: 0
+    - _MakeupRangeSize: 4.32
+    - _MakeupRateofChange: 0.59
+    - _NormalScale: 1
+    - _RampScale: 1
+    - _RimLightScale: 0.3
+    - _SpecularMultiply: 7.3
+    - _SpecularPower: 16.54
+    - _StencilComp: 8
+    - _StencilNo: 1
+    - _StencilOpFail: 0
+    - _StencilOpPass: 0
+    m_Colors:
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _ChannelMask: {r: 0, g: 0, b: 0, a: 0}
+    - _DecalColor1: {r: 1, g: 1, b: 1, a: 1}
+    - _DecalsMakeupColor1: {r: 1, g: 1, b: 1, a: 1}
+    - _EdgeColor: {r: 0, g: 0, b: 0, a: 1}
+    - _ShadowColor: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []
