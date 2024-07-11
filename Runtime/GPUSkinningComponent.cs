@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 [System.Serializable]
 internal class GPUSkinningData
@@ -60,46 +59,6 @@ internal class GPUSkinningData
     }
 }
 
-internal class GPUSkinningState
-{
-    public readonly bool Loop;
-    public readonly int NextState;
-
-    public GPUSkinningState(bool loop, int nextState)
-    {
-        Loop = loop;
-        NextState = nextState;
-    }
-}
-
-public class GPUSkinningStateMachine
-{
-    private readonly Dictionary<int, bool> _isLoops = new();
-    private readonly Dictionary<int, int> _nextStates = new();
-
-    public void RegisterOnceState(int state, int nextState)
-    {
-        _nextStates[state] = nextState;
-    }
-
-    public void RegisterLoopState(int state)
-    {
-        _isLoops[state] = true;
-    }
-
-    internal bool TryGetNextState(int state, out int nextState)
-    {
-        return _nextStates.TryGetValue(state, out nextState);
-    }
-
-    internal bool GetStateIsLoop(int state)
-    {
-        if (!_isLoops.TryGetValue(state, out bool isLoop))
-            isLoop = false;
-        return isLoop;
-    }
-}
-
 public class GPUSkinningComponent : MonoBehaviour
 {
     [SerializeField] float _speed = 1;
@@ -132,7 +91,12 @@ public class GPUSkinningComponent : MonoBehaviour
 
     public void SwitchState(int state)
     {
+        // 尝试重新播放一个循环动作，且当前动作就是目标动作，则跳过
+        int currentAnim = _gpuSkinningData.AnimIndex;
         bool nextStateIsLoop = StateMachine.GetStateIsLoop(state);
+        if (currentAnim == state && nextStateIsLoop)
+            return;
+
         _gpuSkinningData.SwitchState(state, nextStateIsLoop);
     }
 }
