@@ -1,5 +1,5 @@
 ::设置分支名字
-SET ToolName=upm
+SET ToolName=upm-0.5.x
 ::设置模块源路径
 SET ToolAssetPath=Assets/ybwork.GPUSkinning
 
