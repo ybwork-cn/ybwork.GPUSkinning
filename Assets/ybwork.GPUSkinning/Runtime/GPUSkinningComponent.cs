@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UnityEngine.Events;
 
-[System.Serializable]
+[Serializable]
 internal class GPUSkinningData
 {
     public bool ForceUpdate;
@@ -65,32 +67,51 @@ public class GPUSkinningComponent : MonoBehaviour
     [SerializeField] GPUSkinningData _gpuSkinningData;
     public GPUSkinningStateMachine StateMachine { get; private set; }
     private GPUSkinningInfo _gpuSkinningInfo;
+    private readonly UnityEvent<int> _onStateSwitched = new();
+    public UnityEvent<int> OnStateSwitched => _onStateSwitched;
+    private bool canCallback = true;
 
     private void Awake()
     {
         StateMachine = new GPUSkinningStateMachine();
         _gpuSkinningInfo = GetComponent<GPUSkinningInfo>();
         _gpuSkinningData = new GPUSkinningData(GetComponent<MeshRenderer>());
-
-        SwitchState(0);
     }
 
     private void Update()
     {
         _gpuSkinningData.Update(Time.deltaTime * _speed);
 
-        if (!_gpuSkinningData.Loop && _gpuSkinningInfo.AnimaitonLengths[_gpuSkinningData.AnimIndex] <= _gpuSkinningData.CurrentTime)
+        int animIndex = _gpuSkinningData.AnimIndex;
+
+        // 非循环动画，超时
+        if (!_gpuSkinningData.Loop && _gpuSkinningInfo.AnimaitonLengths[animIndex] <= _gpuSkinningData.CurrentTime)
         {
-            if (StateMachine.TryGetNextState(_gpuSkinningData.AnimIndex, out int nextStateIndex))
+            if (canCallback)
+                _onStateSwitched.Invoke(animIndex);
+            canCallback = false;
+
+            if (StateMachine.TryGetNextState(animIndex, out int nextStateIndex))
             {
                 bool nextStateIsLoop = StateMachine.GetStateIsLoop(nextStateIndex);
                 _gpuSkinningData.SwitchState(nextStateIndex, nextStateIsLoop);
+                canCallback = true;
             }
         }
     }
 
+    public void Init(int initState)
+    {
+        bool stateIsLoop = StateMachine.GetStateIsLoop(initState);
+        _gpuSkinningData.SwitchState(initState, stateIsLoop);
+        canCallback = true;
+    }
+
     public void SwitchState(int state)
     {
+        if (_gpuSkinningInfo.AnimaitonLengths.Length <= state)
+            throw new IndexOutOfRangeException($"{state} in [0,{_gpuSkinningInfo.AnimaitonLengths.Length}]");
+
         // 尝试重新播放一个循环动作，且当前动作就是目标动作，则跳过
         int currentAnim = _gpuSkinningData.AnimIndex;
         bool nextStateIsLoop = StateMachine.GetStateIsLoop(state);
@@ -98,5 +119,6 @@ public class GPUSkinningComponent : MonoBehaviour
             return;
 
         _gpuSkinningData.SwitchState(state, nextStateIsLoop);
+        canCallback = true;
     }
 }
