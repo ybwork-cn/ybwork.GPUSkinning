@@ -69,13 +69,13 @@ public class GPUSkinningComponent : MonoBehaviour
     private GPUSkinningInfo _gpuSkinningInfo;
     private readonly UnityEvent<int> _onStateSwitched = new();
     public UnityEvent<int> OnStateSwitched => _onStateSwitched;
-    private bool canCallback = true;
+    private bool _canCallback = true;
 
     private void Awake()
     {
-        StateMachine = new GPUSkinningStateMachine();
         _gpuSkinningInfo = GetComponent<GPUSkinningInfo>();
         _gpuSkinningData = new GPUSkinningData(GetComponent<MeshRenderer>());
+        StateMachine = new GPUSkinningStateMachine(_gpuSkinningInfo);
     }
 
     private void Update()
@@ -87,15 +87,15 @@ public class GPUSkinningComponent : MonoBehaviour
         // 非循环动画，超时
         if (!_gpuSkinningData.Loop && _gpuSkinningInfo.AnimaitonLengths[animIndex] <= _gpuSkinningData.CurrentTime)
         {
-            if (canCallback)
+            if (_canCallback)
                 _onStateSwitched.Invoke(animIndex);
-            canCallback = false;
+            _canCallback = false;
 
             if (StateMachine.TryGetNextState(animIndex, out int nextStateIndex))
             {
                 bool nextStateIsLoop = StateMachine.GetStateIsLoop(nextStateIndex);
                 _gpuSkinningData.SwitchState(nextStateIndex, nextStateIsLoop);
-                canCallback = true;
+                _canCallback = true;
             }
         }
     }
@@ -104,7 +104,7 @@ public class GPUSkinningComponent : MonoBehaviour
     {
         bool stateIsLoop = StateMachine.GetStateIsLoop(initState);
         _gpuSkinningData.SwitchState(initState, stateIsLoop);
-        canCallback = true;
+        _canCallback = true;
     }
 
     public void SwitchState(int state)
@@ -119,6 +119,6 @@ public class GPUSkinningComponent : MonoBehaviour
             return;
 
         _gpuSkinningData.SwitchState(state, nextStateIsLoop);
-        canCallback = true;
+        _canCallback = true;
     }
 }
