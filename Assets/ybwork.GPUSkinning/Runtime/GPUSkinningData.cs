@@ -39,7 +39,7 @@ internal class GPUSkinningData
         _propBlock.SetFloat("_LastAnimIndex", LastAnimIndex);
         _propBlock.SetFloat("_LastAnimExitTime", LastAnimExitTime);
 
-        _renderer.SetPropertyBlock(_propBlock);
+        //_renderer.SetPropertyBlock(_propBlock);
     }
 
     public void Update(float deltaTime)
