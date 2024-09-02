@@ -13,6 +13,21 @@ public class RenderObjectData
     public bool LastAnimLoop;
     public int LastAnimIndex;
     public float LastAnimExitTime;
+
+    public void SwitchState(int state, bool loop)
+    {
+        LastAnimLoop = Loop;
+        LastAnimIndex = AnimIndex;
+        LastAnimExitTime = CurrentTime;
+        Loop = loop;
+        AnimIndex = state;
+        CurrentTime = 0;
+    }
+
+    public void Update(float deltaTime)
+    {
+        CurrentTime += deltaTime;
+    }
 }
 
 public class TempRenderObjectGroup
@@ -34,7 +49,12 @@ public class TempRenderObjectGroup
         if (_matrices.Count <= currentIndex)
         {
             _matrices.Add(new Matrix4x4[1000]);
+            _loops.Add(new float[1000]);
+            _animIndexs.Add(new float[1000]);
             _currentTimes.Add(new float[1000]);
+            _lastAnimLoops.Add(new float[1000]);
+            _lastAnimIndexs.Add(new float[1000]);
+            _lastAnimExitTimes.Add(new float[1000]);
         }
 
         _matrices[currentIndex][Count % 1000] = matrixs;
@@ -100,13 +120,21 @@ public class RenderGroup
         _renderObjects.Add(renderObject);
     }
 
+    public void Update(float deltaTime)
+    {
+        foreach (RenderObject renderObject in _renderObjects)
+        {
+            renderObject.Update(deltaTime);
+        }
+    }
+
     public void Draw()
     {
         Count = 0;
         foreach (var renderObject in _renderObjects)
         {
             Count++;
-            _tempRenderObjects.Add(renderObject.Matrix, renderObject.Data);
+            _tempRenderObjects.Add(renderObject.Matrix, renderObject.RenderObjectData);
         }
         _tempRenderObjects.DrawMeshInstanced(_material, _mesh);
     }

@@ -11,10 +11,6 @@ public class TestUnit : MonoBehaviour
         _skinningComponent.StateMachine.RegisterLoopState(0);
         _skinningComponent.StateMachine.RegisterOnceState(1, 0);
         _skinningComponent.StateMachine.RegisterLoopState(2);
-        _skinningComponent.OnStateSwitched.AddListener(index =>
-        {
-            Debug.Log(index);
-        });
         _skinningComponent.Init(0);
     }
 
