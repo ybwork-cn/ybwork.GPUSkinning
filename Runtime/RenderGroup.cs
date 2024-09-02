@@ -120,6 +120,11 @@ public class RenderGroup
         _renderObjects.Add(renderObject);
     }
 
+    public void RemoveItem(RenderObject renderObject)
+    {
+        _renderObjects.Remove(renderObject);
+    }
+
     public void Update(float deltaTime)
     {
         foreach (RenderObject renderObject in _renderObjects)
