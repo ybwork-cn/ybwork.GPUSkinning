@@ -5,13 +5,7 @@ using UnityEngine;
 internal class GPUSkinningData
 {
     public bool ForceUpdate;
-    public bool Loop;
-    public int AnimIndex;
-    public float CurrentTime;
-
-    public bool LastAnimLoop;
-    public int LastAnimIndex;
-    public float LastAnimExitTime;
+    public RenderObjectData RenderObjectData = new();
 
     private readonly Renderer _renderer;
     private readonly MaterialPropertyBlock _propBlock = new();
@@ -24,20 +18,20 @@ internal class GPUSkinningData
 
     public void SwitchState(int state, bool loop)
     {
-        LastAnimLoop = Loop;
-        LastAnimIndex = AnimIndex;
-        LastAnimExitTime = CurrentTime;
-        Loop = loop;
-        AnimIndex = state;
-        CurrentTime = 0;
+        RenderObjectData.LastAnimLoop = RenderObjectData.Loop;
+        RenderObjectData.LastAnimIndex = RenderObjectData.AnimIndex;
+        RenderObjectData.LastAnimExitTime = RenderObjectData.CurrentTime;
+        RenderObjectData.Loop = loop;
+        RenderObjectData.AnimIndex = state;
+        RenderObjectData.CurrentTime = 0;
 
-        _propBlock.SetFloat("_Loop", Loop ? 1 : 0);
-        _propBlock.SetFloat("_AnimIndex", AnimIndex);
-        _propBlock.SetFloat("_CurrentTime", CurrentTime);
+        _propBlock.SetFloat("_Loop", RenderObjectData.Loop ? 1 : 0);
+        _propBlock.SetFloat("_AnimIndex", RenderObjectData.AnimIndex);
+        _propBlock.SetFloat("_CurrentTime", RenderObjectData.CurrentTime);
 
-        _propBlock.SetFloat("_LastAnimLoop", LastAnimLoop ? 1 : 0);
-        _propBlock.SetFloat("_LastAnimIndex", LastAnimIndex);
-        _propBlock.SetFloat("_LastAnimExitTime", LastAnimExitTime);
+        _propBlock.SetFloat("_LastAnimLoop", RenderObjectData.LastAnimLoop ? 1 : 0);
+        _propBlock.SetFloat("_LastAnimIndex", RenderObjectData.LastAnimIndex);
+        _propBlock.SetFloat("_LastAnimExitTime", RenderObjectData.LastAnimExitTime);
 
         //_renderer.SetPropertyBlock(_propBlock);
     }
@@ -47,17 +41,17 @@ internal class GPUSkinningData
 #if UNITY_EDITOR
         if (ForceUpdate)
         {
-            _propBlock.SetFloat("_Loop", Loop ? 1 : 0);
-            _propBlock.SetFloat("_AnimIndex", AnimIndex);
+            _propBlock.SetFloat("_Loop", RenderObjectData.Loop ? 1 : 0);
+            _propBlock.SetFloat("_AnimIndex", RenderObjectData.AnimIndex);
 
-            _propBlock.SetFloat("_LastAnimLoop", LastAnimLoop ? 1 : 0);
-            _propBlock.SetFloat("_LastAnimIndex", LastAnimIndex);
-            _propBlock.SetFloat("_LastAnimExitTime", LastAnimExitTime);
+            _propBlock.SetFloat("_LastAnimLoop", RenderObjectData.LastAnimLoop ? 1 : 0);
+            _propBlock.SetFloat("_LastAnimIndex", RenderObjectData.LastAnimIndex);
+            _propBlock.SetFloat("_LastAnimExitTime", RenderObjectData.LastAnimExitTime);
         }
 #endif
 
-        CurrentTime += deltaTime;
-        _propBlock.SetFloat("_CurrentTime", CurrentTime);
+        RenderObjectData.CurrentTime += deltaTime;
+        _propBlock.SetFloat("_CurrentTime", RenderObjectData.CurrentTime);
         _renderer.SetPropertyBlock(_propBlock);
     }
 }

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public struct RenderObjectData
+[Serializable]
+public class RenderObjectData
 {
     public bool Loop;
     public int AnimIndex;
@@ -82,11 +83,6 @@ public class RenderGroup
     /// TODO:保存实际用于渲染的数据, 用完就扔, 极大的内存浪费
     /// </summary>
     readonly TempRenderObjectGroup _tempRenderObjects;
-    /// <summary>
-    /// 不同动画状态的渲染件列表
-    /// [] 动画不同状态
-    /// list 处于该状态下的渲染件 
-    /// </summary>
     readonly List<RenderObject> _renderObjects;
 
     public int Count;
@@ -113,6 +109,5 @@ public class RenderGroup
             _tempRenderObjects.Add(renderObject.Matrix, renderObject.Data);
         }
         _tempRenderObjects.DrawMeshInstanced(_material, _mesh);
-        _renderObjects.Clear();
     }
 }
