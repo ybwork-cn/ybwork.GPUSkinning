@@ -5,15 +5,11 @@ public class GPUSkinningComponent : MonoBehaviour
     [SerializeField] float _speed = 1;
     [SerializeField] GPUSkinningData _gpuSkinningData;
     public GPUSkinningStateMachine StateMachine { get; private set; }
-    public readonly Event<int> OnStateSwitched = new Event<int>();
-    private float[] _animaitonLengths;
-    private bool _canCallback = true;
 
     private void Awake()
     {
-        _animaitonLengths = GetComponent<GPUSkinningInfo>().AnimaitonLengths;
         _gpuSkinningData = new GPUSkinningData(GetComponent<MeshRenderer>());
-        StateMachine = new GPUSkinningStateMachine(_animaitonLengths);
+        StateMachine = new GPUSkinningStateMachine(GetComponent<GPUSkinningInfo>());
     }
 
     private void Update()
@@ -23,17 +19,12 @@ public class GPUSkinningComponent : MonoBehaviour
         int animIndex = _gpuSkinningData.RenderObjectData.AnimIndex;
 
         // 非循环动画，超时
-        if (!_gpuSkinningData.RenderObjectData.Loop && _animaitonLengths[animIndex] <= _gpuSkinningData.RenderObjectData.CurrentTime)
+        if (!_gpuSkinningData.RenderObjectData.Loop && StateMachine.AnimaitonLengths[animIndex] <= _gpuSkinningData.RenderObjectData.CurrentTime)
         {
-            if (_canCallback)
-                OnStateSwitched.Invoke(animIndex);
-            _canCallback = false;
-
             if (StateMachine.TryGetNextState(animIndex, out int nextStateIndex))
             {
                 bool nextStateIsLoop = StateMachine.GetStateIsLoop(nextStateIndex);
                 _gpuSkinningData.SwitchState(nextStateIndex, nextStateIsLoop);
-                _canCallback = true;
             }
         }
     }
@@ -42,7 +33,6 @@ public class GPUSkinningComponent : MonoBehaviour
     {
         bool stateIsLoop = StateMachine.GetStateIsLoop(initState);
         _gpuSkinningData.SwitchState(initState, stateIsLoop);
-        _canCallback = true;
     }
 
     public void SwitchState(int state)
@@ -54,6 +44,5 @@ public class GPUSkinningComponent : MonoBehaviour
             return;
 
         _gpuSkinningData.SwitchState(state, nextStateIsLoop);
-        _canCallback = true;
     }
 }

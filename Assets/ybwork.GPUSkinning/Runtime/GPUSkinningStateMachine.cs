@@ -5,30 +5,30 @@ public class GPUSkinningStateMachine
 {
     private readonly Dictionary<int, bool> _isLoops = new();
     private readonly Dictionary<int, int> _nextStates = new();
-    private readonly float[] _animaitonLengths;
+    public readonly float[] AnimaitonLengths;
 
-    public GPUSkinningStateMachine(float[] animaitonLengths)
+    public GPUSkinningStateMachine(GPUSkinningInfo gpuSkinningInfo)
     {
-        _animaitonLengths = animaitonLengths;
+        AnimaitonLengths = gpuSkinningInfo.AnimaitonLengths;
     }
 
     public void RegisterOnceState(int state, int nextState)
     {
-        int length = _animaitonLengths.Length;
+        int length = AnimaitonLengths.Length;
 
         if (state < 0 || state >= length)
-            throw new System.IndexOutOfRangeException($"{nameof(state)} {state} not in [{0},{length})");
+            throw new IndexOutOfRangeException($"{nameof(state)} {state} not in [{0},{length})");
         if (state < 0 || state >= length)
-            throw new System.IndexOutOfRangeException($"{nameof(nextState)} {nextState} not in [{0},{length})");
+            throw new IndexOutOfRangeException($"{nameof(nextState)} {nextState} not in [{0},{length})");
 
         _nextStates[state] = nextState;
     }
 
     public void RegisterLoopState(int state)
     {
-        int length = _animaitonLengths.Length;
+        int length = AnimaitonLengths.Length;
         if (state < 0 || state >= length)
-            throw new System.IndexOutOfRangeException($"{nameof(state)} {state} not in [{0},{length})");
+            throw new IndexOutOfRangeException($"{nameof(state)} {state} not in [{0},{length})");
 
         _isLoops[state] = true;
     }
@@ -40,8 +40,8 @@ public class GPUSkinningStateMachine
 
     internal bool GetStateIsLoop(int state)
     {
-        if (_animaitonLengths.Length <= state)
-            throw new IndexOutOfRangeException($"{state} in [0,{_animaitonLengths.Length}]");
+        if (AnimaitonLengths.Length <= state)
+            throw new IndexOutOfRangeException($"{state} in [0,{AnimaitonLengths.Length}]");
 
         if (!_isLoops.TryGetValue(state, out bool isLoop))
             isLoop = false;
