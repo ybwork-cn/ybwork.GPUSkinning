@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GPUSkinningComponent : MonoBehaviour
 {
@@ -7,24 +6,24 @@ public class GPUSkinningComponent : MonoBehaviour
     [SerializeField] GPUSkinningData _gpuSkinningData;
     public GPUSkinningStateMachine StateMachine { get; private set; }
     public readonly Event<int> OnStateSwitched = new Event<int>();
-    private GPUSkinningInfo _gpuSkinningInfo;
+    private float[] _animaitonLengths;
     private bool _canCallback = true;
 
     private void Awake()
     {
-        _gpuSkinningInfo = GetComponent<GPUSkinningInfo>();
+        _animaitonLengths = GetComponent<GPUSkinningInfo>().AnimaitonLengths;
         _gpuSkinningData = new GPUSkinningData(GetComponent<MeshRenderer>());
-        StateMachine = new GPUSkinningStateMachine(_gpuSkinningInfo);
+        StateMachine = new GPUSkinningStateMachine(_animaitonLengths);
     }
 
     private void Update()
     {
         _gpuSkinningData.Update(Time.deltaTime * _speed);
 
-        int animIndex = _gpuSkinningData.AnimIndex;
+        int animIndex = _gpuSkinningData.RenderObjectData.AnimIndex;
 
         // 非循环动画，超时
-        if (!_gpuSkinningData.Loop && _gpuSkinningInfo.AnimaitonLengths[animIndex] <= _gpuSkinningData.CurrentTime)
+        if (!_gpuSkinningData.RenderObjectData.Loop && _animaitonLengths[animIndex] <= _gpuSkinningData.RenderObjectData.CurrentTime)
         {
             if (_canCallback)
                 OnStateSwitched.Invoke(animIndex);
@@ -48,11 +47,8 @@ public class GPUSkinningComponent : MonoBehaviour
 
     public void SwitchState(int state)
     {
-        if (_gpuSkinningInfo.AnimaitonLengths.Length <= state)
-            throw new IndexOutOfRangeException($"{state} in [0,{_gpuSkinningInfo.AnimaitonLengths.Length}]");
-
         // 尝试重新播放一个循环动作，且当前动作就是目标动作，则跳过
-        int currentAnim = _gpuSkinningData.AnimIndex;
+        int currentAnim = _gpuSkinningData.RenderObjectData.AnimIndex;
         bool nextStateIsLoop = StateMachine.GetStateIsLoop(state);
         if (currentAnim == state && nextStateIsLoop)
             return;

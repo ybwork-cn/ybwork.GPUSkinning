@@ -1,19 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 public class GPUSkinningStateMachine
 {
     private readonly Dictionary<int, bool> _isLoops = new();
     private readonly Dictionary<int, int> _nextStates = new();
-    private readonly GPUSkinningInfo _gpuSkinningInfo;
+    private readonly float[] _animaitonLengths;
 
-    public GPUSkinningStateMachine(GPUSkinningInfo gpuSkinningInfo)
+    public GPUSkinningStateMachine(float[] animaitonLengths)
     {
-        _gpuSkinningInfo = gpuSkinningInfo;
+        _animaitonLengths = animaitonLengths;
     }
 
     public void RegisterOnceState(int state, int nextState)
     {
-        int length = _gpuSkinningInfo.AnimaitonLengths.Length;
+        int length = _animaitonLengths.Length;
 
         if (state < 0 || state >= length)
             throw new System.IndexOutOfRangeException($"{nameof(state)} {state} not in [{0},{length})");
@@ -25,7 +26,7 @@ public class GPUSkinningStateMachine
 
     public void RegisterLoopState(int state)
     {
-        int length = _gpuSkinningInfo.AnimaitonLengths.Length;
+        int length = _animaitonLengths.Length;
         if (state < 0 || state >= length)
             throw new System.IndexOutOfRangeException($"{nameof(state)} {state} not in [{0},{length})");
 
@@ -39,6 +40,9 @@ public class GPUSkinningStateMachine
 
     internal bool GetStateIsLoop(int state)
     {
+        if (_animaitonLengths.Length <= state)
+            throw new IndexOutOfRangeException($"{state} in [0,{_animaitonLengths.Length}]");
+
         if (!_isLoops.TryGetValue(state, out bool isLoop))
             isLoop = false;
         return isLoop;
