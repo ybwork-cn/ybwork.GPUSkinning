@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class RenderSystem
+public class BatchRenderer
 {
     private readonly Dictionary<int, (Material material, Mesh mesh)> _renderInfos = new();
     public Dictionary<int, RenderGroup> RenderGroups = new();
@@ -20,6 +20,11 @@ public class RenderSystem
             RenderGroups.Add(id, group);
         }
         group.Add(renderObject);
+    }
+
+    public void RemoveItem(int id, RenderObject renderObject)
+    {
+        RenderGroups[id].RemoveItem(renderObject);
     }
 
     public void Update(float deltaTime)

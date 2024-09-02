@@ -4,14 +4,14 @@ using ybwork.Async;
 public class TestGPU : MonoBehaviour
 {
     [SerializeField] GameObject _prefab;
-    RenderSystem _renderSystem;
+    BatchRenderer _batchRenderer;
     void Start()
     {
-        _renderSystem = new RenderSystem();
+        _batchRenderer = new BatchRenderer();
         GPUSkinningInfo gpuSkinningInfo = _prefab.GetComponent<GPUSkinningInfo>();
         Material sharedMaterial = _prefab.GetComponent<MeshRenderer>().sharedMaterial;
         Mesh sharedMesh = _prefab.GetComponent<MeshFilter>().sharedMesh;
-        _renderSystem.AddInfo(0, sharedMaterial, sharedMesh);
+        _batchRenderer.AddInfo(0, sharedMaterial, sharedMesh);
         for (int i = 0; i < 50; i++)
         {
             for (int j = 0; j < 60; j++)
@@ -26,14 +26,14 @@ public class TestGPU : MonoBehaviour
                 {
                     renderObject.SwitchState(Random.Range(0, 4));
                 });
-                _renderSystem.AddItem(0, renderObject);
+                _batchRenderer.AddItem(0, renderObject);
             }
         }
     }
 
     private void Update()
     {
-        _renderSystem.Update(Time.deltaTime);
-        _renderSystem.Render();
+        _batchRenderer.Update(Time.deltaTime);
+        _batchRenderer.Render();
     }
 }
