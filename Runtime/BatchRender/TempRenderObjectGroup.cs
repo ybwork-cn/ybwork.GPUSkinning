@@ -3,34 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-[Serializable]
-public class RenderObjectData
-{
-    public bool Loop;
-    public int AnimIndex;
-    public float CurrentTime;
-
-    public bool LastAnimLoop;
-    public int LastAnimIndex;
-    public float LastAnimExitTime;
-
-    public void SwitchState(int state, bool loop)
-    {
-        LastAnimLoop = Loop;
-        LastAnimIndex = AnimIndex;
-        LastAnimExitTime = CurrentTime;
-        Loop = loop;
-        AnimIndex = state;
-        CurrentTime = 0;
-    }
-
-    public void Update(float deltaTime)
-    {
-        CurrentTime += deltaTime;
-    }
-}
-
-public class TempRenderObjectGroup
+internal class TempRenderObjectGroup
 {
     private readonly List<float[]> _loops = new();
     private readonly List<float[]> _animIndexs = new();
@@ -70,7 +43,7 @@ public class TempRenderObjectGroup
     }
 
 
-    public void DrawMeshInstanced(Material material, Mesh mesh)
+    public void DrawMeshInstanced(Material material, Mesh mesh, CommandBuffer cmd)
     {
         if (Count == 0)
             return;
@@ -85,62 +58,21 @@ public class TempRenderObjectGroup
             _block.SetFloatArray("_LastAnimLoop", _lastAnimLoops[i]);
             _block.SetFloatArray("_LastAnimIndex", _lastAnimIndexs[i]);
             _block.SetFloatArray("_LastAnimExitTime", _lastAnimExitTimes[i]);
-
-            Graphics.DrawMeshInstanced(
-                mesh, 0, material,
-                _matrices[i], Math.Min(Count - i * 1000, 1000),
-                _block, ShadowCastingMode.Off, false);
+            if (cmd != null)
+            {
+                cmd.DrawMeshInstanced(
+                    mesh, 0, material, 0,
+                    _matrices[i], Math.Min(Count - i * 1000, 1000),
+                    _block);
+            }
+            else
+            {
+                Graphics.DrawMeshInstanced(
+                    mesh, 0, material,
+                    _matrices[i], Math.Min(Count - i * 1000, 1000),
+                    _block, ShadowCastingMode.Off, false);
+            }
         }
         Count = 0;
-    }
-}
-
-public class RenderGroup
-{
-    readonly Material _material;
-    readonly Mesh _mesh;
-    /// <summary>
-    /// TODO:保存实际用于渲染的数据, 用完就扔, 极大的内存浪费
-    /// </summary>
-    readonly TempRenderObjectGroup _tempRenderObjects;
-    readonly List<RenderObject> _renderObjects;
-
-    public int Count;
-
-    public RenderGroup(Material material, Mesh mesh)
-    {
-        _material = material;
-        _mesh = mesh;
-        _renderObjects = new List<RenderObject>();
-        _tempRenderObjects = new TempRenderObjectGroup();
-    }
-
-    public void Add(RenderObject renderObject)
-    {
-        _renderObjects.Add(renderObject);
-    }
-
-    public void RemoveItem(RenderObject renderObject)
-    {
-        _renderObjects.Remove(renderObject);
-    }
-
-    public void Update(float deltaTime)
-    {
-        foreach (RenderObject renderObject in _renderObjects)
-        {
-            renderObject.Update(deltaTime);
-        }
-    }
-
-    public void Draw()
-    {
-        Count = 0;
-        foreach (var renderObject in _renderObjects)
-        {
-            Count++;
-            _tempRenderObjects.Add(renderObject.Matrix, renderObject.RenderObjectData);
-        }
-        _tempRenderObjects.DrawMeshInstanced(_material, _mesh);
     }
 }
