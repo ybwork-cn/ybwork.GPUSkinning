@@ -42,6 +42,9 @@ internal class RenderGroup
 
     public void Draw(CommandBuffer cmd)
     {
+        if (_material == null || _mesh == null)
+            return;
+
         Count = 0;
         foreach (var renderObject in _renderObjects)
         {
