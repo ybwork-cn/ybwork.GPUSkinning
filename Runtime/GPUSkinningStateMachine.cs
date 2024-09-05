@@ -7,9 +7,9 @@ public class GPUSkinningStateMachine
     private readonly Dictionary<int, int> _nextStates = new();
     public readonly float[] AnimaitonLengths;
 
-    public GPUSkinningStateMachine(GPUSkinningInfo gpuSkinningInfo)
+    public GPUSkinningStateMachine(float[] animaitonLengths)
     {
-        AnimaitonLengths = gpuSkinningInfo.AnimaitonLengths;
+        AnimaitonLengths = animaitonLengths;
     }
 
     public void RegisterOnceState(int state, int nextState)
