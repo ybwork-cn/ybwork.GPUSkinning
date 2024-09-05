@@ -9,7 +9,7 @@ public class GPUSkinningComponent : MonoBehaviour
     private void Awake()
     {
         _gpuSkinningData = new GPUSkinningData(GetComponent<MeshRenderer>());
-        StateMachine = new GPUSkinningStateMachine(GetComponent<GPUSkinningInfo>());
+        StateMachine = new GPUSkinningStateMachine(GetComponent<GPUSkinningInfo>().AnimaitonLengths);
     }
 
     private void Update()

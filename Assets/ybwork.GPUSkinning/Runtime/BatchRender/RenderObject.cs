@@ -8,9 +8,9 @@ public class RenderObject
     internal readonly RenderObjectData RenderObjectData = new();
     public readonly GPUSkinningStateMachine StateMachine;
 
-    public RenderObject(GPUSkinningInfo gpuSkinningInfo)
+    public RenderObject(float[] animaitonLengths)
     {
-        StateMachine = new GPUSkinningStateMachine(gpuSkinningInfo);
+        StateMachine = new GPUSkinningStateMachine(animaitonLengths);
     }
 
     public void Init(int initState)

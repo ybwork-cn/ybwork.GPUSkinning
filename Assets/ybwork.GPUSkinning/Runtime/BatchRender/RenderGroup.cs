@@ -6,6 +6,7 @@ internal class RenderGroup
 {
     readonly Material _material;
     readonly Mesh _mesh;
+    readonly float[] _animaitonLengths;
     /// <summary>
     /// TODO:保存实际用于渲染的数据, 用完就扔, 极大的内存浪费
     /// </summary>
@@ -14,17 +15,20 @@ internal class RenderGroup
 
     public int Count;
 
-    public RenderGroup(Material material, Mesh mesh)
+    public RenderGroup(float[] animaitonLengths, Material material, Mesh mesh)
     {
+        _animaitonLengths = animaitonLengths;
         _material = material;
         _mesh = mesh;
         _renderObjects = new List<RenderObject>();
         _tempRenderObjects = new TempRenderObjectGroup();
     }
 
-    public void Add(RenderObject renderObject)
+    public RenderObject CreateRenderObject()
     {
+        RenderObject renderObject = new RenderObject(_animaitonLengths);
         _renderObjects.Add(renderObject);
+        return renderObject;
     }
 
     public void RemoveItem(RenderObject renderObject)

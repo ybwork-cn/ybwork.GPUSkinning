@@ -11,12 +11,12 @@ public class TestGPU : MonoBehaviour
         GPUSkinningInfo gpuSkinningInfo = _prefab.GetComponent<GPUSkinningInfo>();
         Material sharedMaterial = _prefab.GetComponent<MeshRenderer>().sharedMaterial;
         Mesh sharedMesh = _prefab.GetComponent<MeshFilter>().sharedMesh;
-        _batchRenderer.AddInfo(0, sharedMaterial, sharedMesh);
+        _batchRenderer.AddGroup(0, gpuSkinningInfo.AnimaitonLengths, sharedMaterial, sharedMesh);
         for (int i = 0; i < 50; i++)
         {
             for (int j = 0; j < 60; j++)
             {
-                RenderObject renderObject = new RenderObject(gpuSkinningInfo);
+                RenderObject renderObject = _batchRenderer.CreateRenderObject(0);
                 renderObject.StateMachine.RegisterLoopState(0);
                 renderObject.StateMachine.RegisterOnceState(1, 0);
                 renderObject.StateMachine.RegisterLoopState(2);
@@ -26,7 +26,6 @@ public class TestGPU : MonoBehaviour
                 {
                     renderObject.SwitchState(Random.Range(0, 4));
                 });
-                _batchRenderer.AddItem(0, renderObject);
             }
         }
     }

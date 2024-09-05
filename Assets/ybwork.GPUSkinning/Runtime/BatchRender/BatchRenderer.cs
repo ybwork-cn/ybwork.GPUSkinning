@@ -4,23 +4,16 @@ using UnityEngine.Rendering;
 
 public class BatchRenderer
 {
-    private readonly Dictionary<int, (Material material, Mesh mesh)> _renderInfos = new();
     private readonly Dictionary<int, RenderGroup> _renderGroups = new();
 
-    public void AddInfo(int id, Material material, Mesh mesh)
+    public void AddGroup(int id, float[] animaitonLengths, Material material, Mesh mesh)
     {
-        _renderInfos.Add(id, (material, mesh));
+        _renderGroups.Add(id, new RenderGroup(animaitonLengths, material, mesh));
     }
 
-    public void AddItem(int id, RenderObject renderObject)
+    public RenderObject CreateRenderObject(int id)
     {
-        if (!_renderGroups.TryGetValue(id, out RenderGroup group))
-        {
-            (Material material, Mesh mesh) = _renderInfos[id];
-            group = new RenderGroup(material, mesh);
-            _renderGroups.Add(id, group);
-        }
-        group.Add(renderObject);
+        return _renderGroups[id].CreateRenderObject();
     }
 
     public void RemoveItem(int id, RenderObject renderObject)
