@@ -5,7 +5,7 @@ using UnityEngine;
 public class RenderObject
 {
     public Matrix4x4 Matrix;
-    public readonly RenderObjectData RenderObjectData = new();
+    internal readonly RenderObjectData RenderObjectData = new();
     public readonly GPUSkinningStateMachine StateMachine;
 
     public RenderObject(GPUSkinningInfo gpuSkinningInfo)
