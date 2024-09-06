@@ -1,47 +1,51 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-internal class RenderGroup
+public class RenderGroup
 {
     readonly Material _material;
     readonly Mesh _mesh;
-    readonly float[] _animaitonLengths;
+    public readonly GPUSkinningStateMachine StateMachine;
     /// <summary>
     /// TODO:保存实际用于渲染的数据, 用完就扔, 极大的内存浪费
     /// </summary>
-    readonly TempRenderObjectGroup _tempRenderObjects;
-    readonly List<RenderObject> _renderObjects;
+    readonly TempRenderObjectGroup _tempRenderGroup = new();
+    readonly List<RenderObject> _renderObjects = new();
+    readonly ConcurrentQueue<RenderObject> _tempRenderObjects_Add = new();
+    readonly ConcurrentQueue<RenderObject> _tempRenderObjects_Remove = new();
 
-    public int Count;
+    internal int Count;
 
     public RenderGroup(float[] animaitonLengths, Material material, Mesh mesh)
     {
-        _animaitonLengths = animaitonLengths;
+        StateMachine = new GPUSkinningStateMachine(animaitonLengths);
         _material = material;
         _mesh = mesh;
-        _renderObjects = new List<RenderObject>();
-        _tempRenderObjects = new TempRenderObjectGroup();
     }
 
     public RenderObject CreateRenderObject()
     {
-        RenderObject renderObject = new RenderObject(_animaitonLengths);
-        _renderObjects.Add(renderObject);
+        RenderObject renderObject = new RenderObject(StateMachine);
+        _tempRenderObjects_Add.Enqueue(renderObject);
         return renderObject;
     }
 
     public void RemoveItem(RenderObject renderObject)
     {
-        _renderObjects.Remove(renderObject);
+        _tempRenderObjects_Remove.Enqueue(renderObject);
     }
 
     public void Update(float deltaTime)
     {
+        while (_tempRenderObjects_Remove.TryDequeue(out RenderObject renderObject))
+            _renderObjects.Remove(renderObject);
+        while (_tempRenderObjects_Add.TryDequeue(out RenderObject renderObject))
+            _renderObjects.Add(renderObject);
+
         foreach (RenderObject renderObject in _renderObjects)
-        {
             renderObject.Update(deltaTime);
-        }
     }
 
     public void Draw(CommandBuffer cmd)
@@ -50,11 +54,11 @@ internal class RenderGroup
             return;
 
         Count = 0;
-        foreach (var renderObject in _renderObjects)
+        for (int i = 0; i < _renderObjects.Count; i++)
         {
+            _tempRenderGroup.Add(_renderObjects[i]);
             Count++;
-            _tempRenderObjects.Add(renderObject.Matrix, renderObject.RenderObjectData);
         }
-        _tempRenderObjects.DrawMeshInstanced(_material, _mesh, cmd);
+        _tempRenderGroup.DrawMeshInstanced(_material, _mesh, cmd);
     }
 }

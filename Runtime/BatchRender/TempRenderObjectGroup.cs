@@ -16,8 +16,10 @@ internal class TempRenderObjectGroup
     private readonly MaterialPropertyBlock _block = new();
     private int Count { get; set; }
 
-    public void Add(Matrix4x4 matrixs, RenderObjectData data)
+    public void Add(RenderObject renderObject)
     {
+        RenderObjectData data = renderObject.RenderObjectData;
+
         int currentIndex = Count / 1000;
         if (_matrices.Count <= currentIndex)
         {
@@ -30,7 +32,7 @@ internal class TempRenderObjectGroup
             _lastAnimExitTimes.Add(new float[1000]);
         }
 
-        _matrices[currentIndex][Count % 1000] = matrixs;
+        _matrices[currentIndex][Count % 1000] = renderObject.Matrix;
 
         _loops[currentIndex][Count % 1000] = data.Loop ? 1 : 0;
         _animIndexs[currentIndex][Count % 1000] = data.AnimIndex;
