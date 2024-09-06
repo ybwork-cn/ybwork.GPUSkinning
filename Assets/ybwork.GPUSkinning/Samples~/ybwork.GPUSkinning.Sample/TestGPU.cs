@@ -11,15 +11,15 @@ public class TestGPU : MonoBehaviour
         GPUSkinningInfo gpuSkinningInfo = _prefab.GetComponent<GPUSkinningInfo>();
         Material sharedMaterial = _prefab.GetComponent<MeshRenderer>().sharedMaterial;
         Mesh sharedMesh = _prefab.GetComponent<MeshFilter>().sharedMesh;
-        _batchRenderer.AddGroup(0, gpuSkinningInfo.AnimaitonLengths, sharedMaterial, sharedMesh);
+        var renderGroup = _batchRenderer.AddGroup(0, gpuSkinningInfo.AnimaitonLengths, sharedMaterial, sharedMesh);
+        renderGroup.StateMachine.RegisterLoopState(0);
+        renderGroup.StateMachine.RegisterOnceState(1, 0);
+        renderGroup.StateMachine.RegisterLoopState(2);
         for (int i = 0; i < 50; i++)
         {
             for (int j = 0; j < 60; j++)
             {
                 RenderObject renderObject = _batchRenderer.CreateRenderObject(0);
-                renderObject.StateMachine.RegisterLoopState(0);
-                renderObject.StateMachine.RegisterOnceState(1, 0);
-                renderObject.StateMachine.RegisterLoopState(2);
                 renderObject.Matrix = Matrix4x4.TRS(new Vector3(i, 0, j), Quaternion.identity, Vector3.one);
                 renderObject.Init(0);
                 YueTask.Delay(Random.value * 10).Then(() =>
