@@ -4,6 +4,7 @@ using UnityEngine;
 [Serializable]
 public class RenderObject
 {
+    internal bool Destroyed = false;
     public Matrix4x4 Matrix;
     internal readonly RenderObjectData RenderObjectData = new();
     readonly GPUSkinningStateMachine _stateMachine;
@@ -44,5 +45,10 @@ public class RenderObject
                 RenderObjectData.SwitchState(nextStateIndex, nextStateIsLoop);
             }
         }
+    }
+
+    public void Destroy()
+    {
+        Destroyed = true;
     }
 }

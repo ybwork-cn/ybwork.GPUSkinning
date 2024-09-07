@@ -18,11 +18,6 @@ public class BatchRenderer
         return _renderGroups[id].CreateRenderObject();
     }
 
-    public void RemoveItem(int id, RenderObject renderObject)
-    {
-        _renderGroups[id].RemoveItem(renderObject);
-    }
-
     public void Update(float deltaTime)
     {
         foreach (RenderGroup renderGroup in _renderGroups.Values)
