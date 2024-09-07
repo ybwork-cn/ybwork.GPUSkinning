@@ -14,7 +14,6 @@ public class RenderGroup
     readonly TempRenderObjectGroup _tempRenderGroup = new();
     readonly List<RenderObject> _renderObjects = new();
     readonly ConcurrentQueue<RenderObject> _tempRenderObjects_Add = new();
-    readonly ConcurrentQueue<RenderObject> _tempRenderObjects_Remove = new();
 
     internal int Count;
 
@@ -32,20 +31,16 @@ public class RenderGroup
         return renderObject;
     }
 
-    public void RemoveItem(RenderObject renderObject)
-    {
-        _tempRenderObjects_Remove.Enqueue(renderObject);
-    }
-
     public void Update(float deltaTime)
     {
-        while (_tempRenderObjects_Remove.TryDequeue(out RenderObject renderObject))
-            _renderObjects.Remove(renderObject);
+        _renderObjects.RemoveAll(renderObject => renderObject.Destroyed);
         while (_tempRenderObjects_Add.TryDequeue(out RenderObject renderObject))
             _renderObjects.Add(renderObject);
 
         foreach (RenderObject renderObject in _renderObjects)
+        {
             renderObject.Update(deltaTime);
+        }
     }
 
     public void Draw(CommandBuffer cmd)
