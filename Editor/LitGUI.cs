@@ -187,7 +187,7 @@ public static class LitGUI
             bool flagSmoothnessMap = properties.smoothnessGlossMap.textureValue != null;
             smoothnessChannelNames = Styles.metallicSmoothnessChannelNames;
             materialEditor.TexturePropertySingleLine(Styles.metallicMapText, properties.metallicGlossMap, flagSpecularMap ? null : properties.metallic);
-            materialEditor.TexturePropertySingleLine(Styles.smoothnessMapText, properties.smoothnessGlossMap, flagSmoothnessMap ? null : properties.metallic);
+            materialEditor.TexturePropertySingleLine(Styles.smoothnessMapText, properties.smoothnessGlossMap, flagSmoothnessMap ? null : properties.smoothness);
         }
         else
         {
