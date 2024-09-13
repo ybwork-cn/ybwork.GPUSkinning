@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
@@ -7,6 +8,7 @@ public class RenderObject
     internal bool Destroyed = false;
     public Matrix4x4 Matrix;
     internal readonly RenderObjectData RenderObjectData = new();
+    public readonly Dictionary<string, float> OtherProps = new();
     readonly GPUSkinningStateMachine _stateMachine;
 
     public RenderObject(GPUSkinningStateMachine stateMachine)
