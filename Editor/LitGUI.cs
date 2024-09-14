@@ -26,8 +26,6 @@ public static class LitGUI
 
         public static GUIContent metallicMapText = EditorGUIUtility.TrTextContent("Metallic Map", "Sets and configures the map for the Metallic workflow.");
 
-        public static GUIContent smoothnessText = EditorGUIUtility.TrTextContent("Smoothness", "Controls the spread of highlights and reflections on the surface.");
-
         public static GUIContent smoothnessMapText = EditorGUIUtility.TrTextContent("Smoothness Map", "Sets and configures the map for the Metallic workflow.");
 
         public static GUIContent smoothnessMapChannelText = EditorGUIUtility.TrTextContent("Source", "Specifies where to sample a smoothness map from. By default, uses the alpha channel for your map.");
@@ -320,6 +318,8 @@ public static class LitGUI
             CoreUtils.SetKeyword(material, "_CLEARCOATMAP", state: false);
         }
 
+        name = "_SmoothnessGlossMap";
+        state = material.GetTexture(name) != null;
         CoreUtils.SetKeyword(material, "_SMOOTHNESSGLOSSMAP", state);
     }
 }
