@@ -64,8 +64,7 @@ internal class TempRenderObjectGroup
         _count++;
     }
 
-
-    public void DrawMeshInstanced(Material material, Mesh mesh, CommandBuffer cmd)
+    public void DrawMeshInstanced(Material material, Mesh mesh, CommandBuffer cmd, int shaderPass)
     {
         if (_count == 0)
             return;
@@ -84,20 +83,37 @@ internal class TempRenderObjectGroup
             for (int propIndex = 0; propIndex < _customPropNames.Length; propIndex++)
                 _block.SetFloatArray(_customPropNames[propIndex], _customProps[propIndex][i]);
 
-            if (cmd != null)
-            {
-                cmd.DrawMeshInstanced(
-                    mesh, 0, material, 0,
-                    _matrices[i], Math.Min(_count - i * 1000, 1000),
-                    _block);
-            }
-            else
-            {
-                Graphics.DrawMeshInstanced(
-                    mesh, 0, material,
-                    _matrices[i], Math.Min(_count - i * 1000, 1000),
-                    _block, ShadowCastingMode.Off, false);
-            }
+            cmd.DrawMeshInstanced(
+                mesh, 0, material, shaderPass,
+                _matrices[i], Math.Min(_count - i * 1000, 1000),
+                _block);
+        }
+        _count = 0;
+    }
+
+    public void DrawMeshInstanced(Material material, Mesh mesh, bool isCastShadow, bool receiveShadows)
+    {
+        if (_count == 0)
+            return;
+
+        _block.Clear();
+        for (int i = 0; i < (_count - 1) / 1000 + 1; i++)
+        {
+            _block.SetFloatArray("_Loop", _loops[i]);
+            _block.SetFloatArray("_AnimIndex", _animIndexs[i]);
+            _block.SetFloatArray("_CurrentTime", _currentTimes[i]);
+
+            _block.SetFloatArray("_LastAnimLoop", _lastAnimLoops[i]);
+            _block.SetFloatArray("_LastAnimIndex", _lastAnimIndexs[i]);
+            _block.SetFloatArray("_LastAnimExitTime", _lastAnimExitTimes[i]);
+
+            for (int propIndex = 0; propIndex < _customPropNames.Length; propIndex++)
+                _block.SetFloatArray(_customPropNames[propIndex], _customProps[propIndex][i]);
+
+            Graphics.DrawMeshInstanced(
+                mesh, 0, material,
+                _matrices[i], Math.Min(_count - i * 1000, 1000),
+                _block, isCastShadow ? ShadowCastingMode.On : ShadowCastingMode.Off, receiveShadows);
         }
         _count = 0;
     }

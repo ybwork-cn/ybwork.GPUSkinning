@@ -25,14 +25,20 @@ public class BatchRenderer
     }
 
     /// <summary>
-    /// 允许在Update中或者渲染管线的RendererFeature中调用
-    /// Update中不需要参数
-    /// RendererFeature中需要传入CommandBuffer
+    /// 允许在渲染管线的RendererFeature中调用
     /// </summary>
-    /// <param name="cmd"></param>
-    public void Render(CommandBuffer cmd = null)
+    public void Render(CommandBuffer cmd, int shaderPass)
     {
         foreach (RenderGroup renderGroup in _renderGroups.Values)
-            renderGroup.Draw(cmd);
+            renderGroup.Draw(cmd, shaderPass);
+    }
+
+    /// <summary>
+    /// 允许在Update中调用
+    /// </summary>
+    public void Render(bool isCastShadow, bool receiveShadows)
+    {
+        foreach (RenderGroup renderGroup in _renderGroups.Values)
+            renderGroup.Draw(isCastShadow, receiveShadows);
     }
 }

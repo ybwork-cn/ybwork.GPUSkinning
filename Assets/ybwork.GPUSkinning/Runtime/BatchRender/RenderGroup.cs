@@ -46,7 +46,7 @@ public class RenderGroup
         }
     }
 
-    public void Draw(CommandBuffer cmd)
+    public void Draw(CommandBuffer cmd, int shaderPass)
     {
         if (_material == null || _mesh == null)
             return;
@@ -57,6 +57,20 @@ public class RenderGroup
             _tempRenderGroup.AddRange(_renderObjects[i]);
             Count++;
         }
-        _tempRenderGroup.DrawMeshInstanced(_material, _mesh, cmd);
+        _tempRenderGroup.DrawMeshInstanced(_material, _mesh, cmd, shaderPass);
+    }
+
+    public void Draw(bool isCastShadow, bool receiveShadows)
+    {
+        if (_material == null || _mesh == null)
+            return;
+
+        Count = 0;
+        for (int i = 0; i < _renderObjects.Count; i++)
+        {
+            _tempRenderGroup.AddRange(_renderObjects[i]);
+            Count++;
+        }
+        _tempRenderGroup.DrawMeshInstanced(_material, _mesh, isCastShadow, receiveShadows);
     }
 }
