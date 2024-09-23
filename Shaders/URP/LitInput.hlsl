@@ -9,6 +9,8 @@
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/ParallaxMapping.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DBuffer.hlsl"
 
+#define GetProp(t) UNITY_ACCESS_INSTANCED_PROP(Props, t)
+
 #if defined(_DETAIL_MULX2) || defined(_DETAIL_SCALED)
 #define _DETAIL
 #endif
@@ -48,6 +50,7 @@ UNITY_DEFINE_INSTANCED_PROP(float, _CurrentTime)
 UNITY_DEFINE_INSTANCED_PROP(int, _LastAnimLoop)
 UNITY_DEFINE_INSTANCED_PROP(int, _LastAnimIndex)
 UNITY_DEFINE_INSTANCED_PROP(float, _LastAnimExitTime)
+UNITY_DEFINE_INSTANCED_PROP(float, _EmissionForce)
 UNITY_INSTANCING_BUFFER_END(Props)
 
 // NOTE: Do not ifdef the properties for dots instancing, but ifdef the actual usage.
@@ -59,6 +62,7 @@ UNITY_DOTS_INSTANCING_START(MaterialPropertyMetadata)
     UNITY_DOTS_INSTANCED_PROP(float4, _BaseColor)
     UNITY_DOTS_INSTANCED_PROP(float4, _SpecColor)
     UNITY_DOTS_INSTANCED_PROP(float4, _EmissionColor)
+    UNITY_DOTS_INSTANCED_PROP(float, _EmissionForce)
     UNITY_DOTS_INSTANCED_PROP(float , _Cutoff)
     UNITY_DOTS_INSTANCED_PROP(float , _Smoothness)
     UNITY_DOTS_INSTANCED_PROP(float , _Metallic)
@@ -75,6 +79,7 @@ UNITY_DOTS_INSTANCING_END(MaterialPropertyMetadata)
 #define _BaseColor              UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4 , _BaseColor)
 #define _SpecColor              UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4 , _SpecColor)
 #define _EmissionColor          UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float4 , _EmissionColor)
+#define _EmissionForce          UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float , _EmissionForce)
 #define _Cutoff                 UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float  , _Cutoff)
 #define _Smoothness             UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float  , _Smoothness)
 #define _Metallic               UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(float  , _Metallic)
@@ -245,7 +250,7 @@ inline void InitializeStandardLitSurfaceData(float2 uv, out SurfaceData outSurfa
     outSurfaceData.smoothness = specGloss.a;
     outSurfaceData.normalTS = SampleNormal(uv, TEXTURE2D_ARGS(_BumpMap, sampler_BumpMap), _BumpScale);
     outSurfaceData.occlusion = SampleOcclusion(uv);
-    outSurfaceData.emission = SampleEmission(uv, _EmissionColor.rgb, TEXTURE2D_ARGS(_EmissionMap, sampler_EmissionMap));
+    outSurfaceData.emission = SampleEmission(uv, _EmissionColor.rgb * GetProp(_EmissionForce), TEXTURE2D_ARGS(_EmissionMap, sampler_EmissionMap));
 
 #if defined(_CLEARCOAT) || defined(_CLEARCOATMAP)
     half2 clearCoat = SampleClearCoat(uv);
