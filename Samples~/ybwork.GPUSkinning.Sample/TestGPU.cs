@@ -39,6 +39,6 @@ public class TestGPU : MonoBehaviour
     private void Update()
     {
         _batchRenderer.Update(Time.deltaTime);
-        _batchRenderer.Render();
+        _batchRenderer.Render(true, true);
     }
 }
