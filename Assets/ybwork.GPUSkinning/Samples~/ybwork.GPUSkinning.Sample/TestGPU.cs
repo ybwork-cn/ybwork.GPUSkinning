@@ -14,7 +14,8 @@ public class TestGPU : MonoBehaviour
         //_material.EnableKeyword("_EMISSION");
         //_material.SetColor("_EmissionColor", Color.white);
         Mesh sharedMesh = _prefab.GetComponent<MeshFilter>().sharedMesh;
-        var renderGroup = _batchRenderer.AddGroup(0, gpuSkinningInfo.AnimaitonLengths, _material, sharedMesh);
+        string[] customPropNames = new string[] { "_EmissionForce" };
+        RenderGroup renderGroup = _batchRenderer.AddGroup(0, gpuSkinningInfo.AnimaitonLengths, _material, sharedMesh, customPropNames);
         renderGroup.StateMachine.RegisterLoopState(0);
         renderGroup.StateMachine.RegisterOnceState(1, 0);
         renderGroup.StateMachine.RegisterLoopState(2);
@@ -25,7 +26,8 @@ public class TestGPU : MonoBehaviour
                 RenderObject renderObject = _batchRenderer.CreateRenderObject(0);
                 renderObject.Matrix = Matrix4x4.TRS(new Vector3(i, 0, j), Quaternion.identity, Vector3.one);
                 renderObject.Init(0);
-                //renderObject.OtherProps["_EmissionForce"] = Random.value;
+                int emissionForcePropId = renderObject.GetCustomPropId("_EmissionForce");
+                //renderObject.OtherProps[emissionForcePropId] = Random.value;
                 YueTask.Delay(Random.value * 10).Then(() =>
                 {
                     renderObject.SwitchState(Random.Range(0, 4));

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
@@ -8,12 +7,20 @@ public class RenderObject
     internal bool Destroyed = false;
     public Matrix4x4 Matrix;
     internal readonly RenderObjectData RenderObjectData = new();
-    public readonly Dictionary<string, float> OtherProps = new();
     readonly GPUSkinningStateMachine _stateMachine;
+    private readonly string[] _customPropNames;
+    public readonly float[] CustomPropValues;
 
-    public RenderObject(GPUSkinningStateMachine stateMachine)
+    public RenderObject(GPUSkinningStateMachine stateMachine, string[] customPropNames)
     {
         _stateMachine = stateMachine;
+        _customPropNames = customPropNames;
+        CustomPropValues = new float[customPropNames.Length];
+    }
+
+    public int GetCustomPropId(string propName)
+    {
+        return Array.IndexOf(_customPropNames, propName);
     }
 
     public void Init(int initState)
