@@ -38,6 +38,7 @@ Shader "ybwork/GPUSkinningShader/URP"
         _OcclusionStrength("Strength", Range(0.0, 1.0)) = 1.0
         _OcclusionMap("Occlusion", 2D) = "white" {}
 
+        _EmissionForce("Emission Force", Range(0, 1)) = 1
         [HDR] _EmissionColor("Color", Color) = (0, 0, 0)
         _EmissionMap("Emission", 2D) = "white" {}
 
@@ -206,7 +207,7 @@ Shader "ybwork/GPUSkinningShader/URP"
             #pragma shader_feature_local_fragment _ALPHATEST_ON
             #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 
-            //--------------------------------------
+            // --------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
@@ -233,7 +234,7 @@ Shader "ybwork/GPUSkinningShader/URP"
             {
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-                outColor = half4(0,0,0,0);
+                outColor = half4(0, 0, 0, 0);
             }
             ENDHLSL
         }
