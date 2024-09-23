@@ -4,11 +4,12 @@ public class GPUSkinningComponent : MonoBehaviour
 {
     [SerializeField] float _speed = 1;
     [SerializeField] GPUSkinningData _gpuSkinningData;
+    [SerializeField] string[] _customPropNames;
     public GPUSkinningStateMachine StateMachine { get; private set; }
 
     private void Awake()
     {
-        _gpuSkinningData = new GPUSkinningData(GetComponent<MeshRenderer>());
+        _gpuSkinningData = new GPUSkinningData(GetComponent<MeshRenderer>(), _customPropNames);
         StateMachine = new GPUSkinningStateMachine(GetComponent<GPUSkinningInfo>().AnimaitonLengths);
     }
 

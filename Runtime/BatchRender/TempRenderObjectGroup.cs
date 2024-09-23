@@ -11,13 +11,22 @@ internal class TempRenderObjectGroup
     private readonly List<float[]> _lastAnimLoops = new();
     private readonly List<float[]> _lastAnimIndexs = new();
     private readonly List<float[]> _lastAnimExitTimes = new();
-    private readonly Dictionary<string, List<float[]>> _otherProps = new();
+    private readonly List<float[]>[] _customProps;
 
     private readonly List<Matrix4x4[]> _matrices = new();
-    private readonly MaterialPropertyBlock _block = new();
-    private int _count;
 
-    public void Add(RenderObject renderObject)
+    private readonly MaterialPropertyBlock _block = new();
+    private readonly string[] _customPropNames;
+
+    public TempRenderObjectGroup(string[] customPropNames)
+    {
+        _customPropNames = customPropNames;
+        _customProps = new List<float[]>[customPropNames.Length];
+    }
+
+    private int _count = 0;
+
+    public void AddRange(RenderObject renderObject)
     {
         RenderObjectData data = renderObject.RenderObjectData;
 
@@ -32,11 +41,11 @@ internal class TempRenderObjectGroup
             _lastAnimIndexs.Add(new float[1000]);
             _lastAnimExitTimes.Add(new float[1000]);
 
-            foreach (var item in renderObject.OtherProps)
+            for (int i = 0; i < _customPropNames.Length; i++)
             {
-                if (!_otherProps.ContainsKey(item.Key))
-                    _otherProps[item.Key] = new List<float[]>();
-                _otherProps[item.Key].Add(new float[1000]);
+                if (_customProps[i] == null)
+                    _customProps[i] = new List<float[]>();
+                _customProps[i].Add(new float[1000]);
             }
         }
 
@@ -49,8 +58,8 @@ internal class TempRenderObjectGroup
         _lastAnimIndexs[currentIndex][_count % 1000] = data.LastAnimIndex;
         _lastAnimExitTimes[currentIndex][_count % 1000] = data.LastAnimExitTime;
 
-        foreach (var item in renderObject.OtherProps)
-            _otherProps[item.Key][currentIndex][_count % 1000] = item.Value;
+        for (int i = 0; i < _customPropNames.Length; i++)
+            _customProps[i][currentIndex][_count % 1000] = renderObject.CustomPropValues[i];
 
         _count++;
     }
@@ -72,8 +81,8 @@ internal class TempRenderObjectGroup
             _block.SetFloatArray("_LastAnimIndex", _lastAnimIndexs[i]);
             _block.SetFloatArray("_LastAnimExitTime", _lastAnimExitTimes[i]);
 
-            foreach (var item in _otherProps)
-                _block.SetFloatArray(item.Key, item.Value[i]);
+            for (int propIndex = 0; propIndex < _customPropNames.Length; propIndex++)
+                _block.SetFloatArray(_customPropNames[propIndex], _customProps[propIndex][i]);
 
             if (cmd != null)
             {

@@ -6,9 +6,9 @@ public class BatchRenderer
 {
     private readonly Dictionary<int, RenderGroup> _renderGroups = new();
 
-    public RenderGroup AddGroup(int id, float[] animaitonLengths, Material material, Mesh mesh)
+    public RenderGroup AddGroup(int id, float[] animaitonLengths, Material material, Mesh mesh, string[] customPropNames)
     {
-        RenderGroup renderGroup = new RenderGroup(animaitonLengths, material, mesh);
+        RenderGroup renderGroup = new RenderGroup(animaitonLengths, material, mesh, customPropNames);
         _renderGroups.Add(id, renderGroup);
         return renderGroup;
     }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
@@ -7,15 +6,17 @@ internal class GPUSkinningData
 {
     public bool ForceUpdate;
     public RenderObjectData RenderObjectData = new();
-    public readonly Dictionary<string, float> OtherProps = new();
+    private readonly string[] _customPropNames;
+    public readonly float[] CustomPropValues;
 
     private readonly Renderer _renderer;
     private readonly MaterialPropertyBlock _propBlock = new();
 
-    public GPUSkinningData(Renderer renderer)
+    public GPUSkinningData(Renderer renderer, string[] customPropNames)
     {
         _renderer = renderer;
         _renderer.GetPropertyBlock(_propBlock);
+        _customPropNames = customPropNames;
     }
 
     public void SwitchState(int state, bool loop)
@@ -30,8 +31,8 @@ internal class GPUSkinningData
         _propBlock.SetFloat("_LastAnimIndex", RenderObjectData.LastAnimIndex);
         _propBlock.SetFloat("_LastAnimExitTime", RenderObjectData.LastAnimExitTime);
 
-        foreach (var item in OtherProps)
-            _propBlock.SetFloat(item.Key, item.Value);
+        for (int i = 0; i < _customPropNames.Length; i++)
+            _propBlock.SetFloat(_customPropNames[i], CustomPropValues[i]);
 
         //_renderer.SetPropertyBlock(_propBlock);
     }
@@ -53,8 +54,8 @@ internal class GPUSkinningData
             _propBlock.SetFloat("_LastAnimExitTime", RenderObjectData.LastAnimExitTime);
         }
 
-        foreach (var item in OtherProps)
-            _propBlock.SetFloat(item.Key, item.Value);
+        for (int i = 0; i < _customPropNames.Length; i++)
+            _propBlock.SetFloat(_customPropNames[i], CustomPropValues[i]);
 #endif
 
         _renderer.SetPropertyBlock(_propBlock);
