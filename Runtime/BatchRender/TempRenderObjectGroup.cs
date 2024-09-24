@@ -24,53 +24,79 @@ internal class TempRenderObjectGroup
         _customProps = new List<float[]>[customPropNames.Length];
     }
 
-    private int _count = 0;
-
-    public void AddRange(RenderObject renderObject)
+    private void AddRange(List<RenderObject> renderObjects)
     {
-        RenderObjectData data = renderObject.RenderObjectData;
+        Matrix4x4[] cur_matrices = null;
+        float[] cur_loops = null;
+        float[] cur_animIndexs = null;
+        float[] cur_currentTimes = null;
+        float[] cur_lastAnimLoops = null;
+        float[] cur_lastAnimIndexs = null;
+        float[] cur_lastAnimExitTimes = null;
 
-        int currentIndex = _count / 1000;
-        if (_matrices.Count <= currentIndex)
+        int count = renderObjects.Count;
+        for (int i = 0; i < count; i++)
         {
-            _matrices.Add(new Matrix4x4[1000]);
-            _loops.Add(new float[1000]);
-            _animIndexs.Add(new float[1000]);
-            _currentTimes.Add(new float[1000]);
-            _lastAnimLoops.Add(new float[1000]);
-            _lastAnimIndexs.Add(new float[1000]);
-            _lastAnimExitTimes.Add(new float[1000]);
+            RenderObject renderObject = renderObjects[i];
+            RenderObjectData data = renderObject.RenderObjectData;
 
-            for (int i = 0; i < _customPropNames.Length; i++)
+            int arrayIndex = i / 1000;
+            int index = i % 1000;
+
+            if (_matrices.Count <= arrayIndex)
             {
-                if (_customProps[i] == null)
-                    _customProps[i] = new List<float[]>();
-                _customProps[i].Add(new float[1000]);
+                _matrices.Add(new Matrix4x4[1000]);
+                _loops.Add(new float[1000]);
+                _animIndexs.Add(new float[1000]);
+                _currentTimes.Add(new float[1000]);
+                _lastAnimLoops.Add(new float[1000]);
+                _lastAnimIndexs.Add(new float[1000]);
+                _lastAnimExitTimes.Add(new float[1000]);
+
+                for (int prpIndex = 0; prpIndex < _customPropNames.Length; prpIndex++)
+                {
+                    if (_customProps[prpIndex] == null)
+                        _customProps[prpIndex] = new List<float[]>();
+                    _customProps[prpIndex].Add(new float[1000]);
+                }
             }
+
+            if (index == 0)
+            {
+                cur_matrices = _matrices[arrayIndex];
+
+                cur_loops = _loops[arrayIndex];
+                cur_animIndexs = _animIndexs[arrayIndex];
+                cur_currentTimes = _currentTimes[arrayIndex];
+                cur_lastAnimLoops = _lastAnimLoops[arrayIndex];
+                cur_lastAnimIndexs = _lastAnimIndexs[arrayIndex];
+                cur_lastAnimExitTimes = _lastAnimExitTimes[arrayIndex];
+            }
+
+            cur_matrices[index] = renderObject.Matrix;
+
+            cur_loops[index] = data.Loop ? 1 : 0;
+            cur_animIndexs[index] = data.AnimIndex;
+            cur_currentTimes[index] = data.CurrentTime;
+            cur_lastAnimLoops[index] = data.LastAnimLoop ? 1 : 0;
+            cur_lastAnimIndexs[index] = data.LastAnimIndex;
+            cur_lastAnimExitTimes[index] = data.LastAnimExitTime;
+
+            for (int propIndex = 0; propIndex < _customPropNames.Length; propIndex++)
+                _customProps[propIndex][arrayIndex][index] = renderObject.CustomPropValues[propIndex];
         }
-
-        _matrices[currentIndex][_count % 1000] = renderObject.Matrix;
-
-        _loops[currentIndex][_count % 1000] = data.Loop ? 1 : 0;
-        _animIndexs[currentIndex][_count % 1000] = data.AnimIndex;
-        _currentTimes[currentIndex][_count % 1000] = data.CurrentTime;
-        _lastAnimLoops[currentIndex][_count % 1000] = data.LastAnimLoop ? 1 : 0;
-        _lastAnimIndexs[currentIndex][_count % 1000] = data.LastAnimIndex;
-        _lastAnimExitTimes[currentIndex][_count % 1000] = data.LastAnimExitTime;
-
-        for (int i = 0; i < _customPropNames.Length; i++)
-            _customProps[i][currentIndex][_count % 1000] = renderObject.CustomPropValues[i];
-
-        _count++;
     }
 
-    public void DrawMeshInstanced(Material material, Mesh mesh, CommandBuffer cmd, int shaderPass)
+    public void DrawMeshInstanced(List<RenderObject> renderObjects, Material material, Mesh mesh, CommandBuffer cmd, int shaderPass)
     {
-        if (_count == 0)
+        int count = renderObjects.Count;
+        if (count == 0)
             return;
 
+        AddRange(renderObjects);
+
         _block.Clear();
-        for (int i = 0; i < (_count - 1) / 1000 + 1; i++)
+        for (int i = 0; i < (count - 1) / 1000 + 1; i++)
         {
             _block.SetFloatArray("_Loop", _loops[i]);
             _block.SetFloatArray("_AnimIndex", _animIndexs[i]);
@@ -85,19 +111,21 @@ internal class TempRenderObjectGroup
 
             cmd.DrawMeshInstanced(
                 mesh, 0, material, shaderPass,
-                _matrices[i], Math.Min(_count - i * 1000, 1000),
+                _matrices[i], Math.Min(count - i * 1000, 1000),
                 _block);
         }
-        _count = 0;
     }
 
-    public void DrawMeshInstanced(Material material, Mesh mesh, bool isCastShadow, bool receiveShadows)
+    public void DrawMeshInstanced(List<RenderObject> renderObjects, Material material, Mesh mesh, bool isCastShadow, bool receiveShadows)
     {
-        if (_count == 0)
+        int count = renderObjects.Count;
+        if (count == 0)
             return;
 
+        AddRange(renderObjects);
+
         _block.Clear();
-        for (int i = 0; i < (_count - 1) / 1000 + 1; i++)
+        for (int i = 0; i < (count - 1) / 1000 + 1; i++)
         {
             _block.SetFloatArray("_Loop", _loops[i]);
             _block.SetFloatArray("_AnimIndex", _animIndexs[i]);
@@ -112,9 +140,8 @@ internal class TempRenderObjectGroup
 
             Graphics.DrawMeshInstanced(
                 mesh, 0, material,
-                _matrices[i], Math.Min(_count - i * 1000, 1000),
+                _matrices[i], Math.Min(count - i * 1000, 1000),
                 _block, isCastShadow ? ShadowCastingMode.On : ShadowCastingMode.Off, receiveShadows);
         }
-        _count = 0;
     }
 }

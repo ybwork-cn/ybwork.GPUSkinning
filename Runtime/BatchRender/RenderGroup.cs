@@ -9,14 +9,11 @@ public class RenderGroup
     readonly Mesh _mesh;
     private readonly string[] _customPropNames;
     public readonly GPUSkinningStateMachine StateMachine;
-    /// <summary>
-    /// TODO:保存实际用于渲染的数据, 用完就扔, 极大的内存浪费
-    /// </summary>
     readonly TempRenderObjectGroup _tempRenderGroup;
     readonly List<RenderObject> _renderObjects = new();
     readonly ConcurrentQueue<RenderObject> _tempRenderObjects_Add = new();
 
-    internal int Count;
+    internal int Count => _renderObjects.Count;
 
     internal RenderGroup(float[] animaitonLengths, Material material, Mesh mesh, params string[] customPropNames)
     {
@@ -51,13 +48,7 @@ public class RenderGroup
         if (_material == null || _mesh == null)
             return;
 
-        Count = 0;
-        for (int i = 0; i < _renderObjects.Count; i++)
-        {
-            _tempRenderGroup.AddRange(_renderObjects[i]);
-            Count++;
-        }
-        _tempRenderGroup.DrawMeshInstanced(_material, _mesh, cmd, shaderPass);
+        _tempRenderGroup.DrawMeshInstanced(_renderObjects, _material, _mesh, cmd, shaderPass);
     }
 
     public void Draw(bool isCastShadow, bool receiveShadows)
@@ -65,12 +56,6 @@ public class RenderGroup
         if (_material == null || _mesh == null)
             return;
 
-        Count = 0;
-        for (int i = 0; i < _renderObjects.Count; i++)
-        {
-            _tempRenderGroup.AddRange(_renderObjects[i]);
-            Count++;
-        }
-        _tempRenderGroup.DrawMeshInstanced(_material, _mesh, isCastShadow, receiveShadows);
+        _tempRenderGroup.DrawMeshInstanced(_renderObjects, _material, _mesh, isCastShadow, receiveShadows);
     }
 }
