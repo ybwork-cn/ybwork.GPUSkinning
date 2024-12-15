@@ -1,5 +1,7 @@
-﻿using UnityEngine;
-using ybwork.Async;
+﻿using System;
+using System.Collections;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class TestGPU : MonoBehaviour
 {
@@ -32,12 +34,22 @@ public class TestGPU : MonoBehaviour
                 renderObject.Init(0);
                 int emissionForcePropId = renderObject.GetCustomPropId("_EmissionForce");
                 //renderObject.OtherProps[emissionForcePropId] = Random.value;
-                YueTask.Delay(Random.value * 10).Then(() =>
+                WaitAndThen(Random.value * 10, () =>
                 {
                     renderObject.SwitchState(Random.Range(0, 4));
                 });
             }
         }
+    }
+
+    private void WaitAndThen(float seconds, Action action)
+    {
+        IEnumerator DoWaitAndThen()
+        {
+            yield return new WaitForSeconds(seconds);
+            action?.Invoke();
+        }
+        StartCoroutine(DoWaitAndThen());
     }
 
     private void Update()
