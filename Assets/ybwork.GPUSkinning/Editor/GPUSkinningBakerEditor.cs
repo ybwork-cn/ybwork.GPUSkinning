@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 /// <summary>
 /// 保存需要烘焙的动画的相关数据
@@ -143,6 +142,22 @@ public static class GPUSkinningBakerUtils
             GPUSkinningBaker baker = go.GetComponent<GPUSkinningBaker>();
             bakers.Add((assetPath, baker));
         }
+
+        var repeatAssets = bakers
+            .GroupBy(item => Path.GetDirectoryName(item.assetPath))
+            .Select(group => group.ToArray())
+            .Where(group => group.Length > 1)
+            .SelectMany(group => group)
+            .Select(item => item.assetPath)
+            .ToArray();
+
+        // 同一路径下的多个资源报错并不处理
+        foreach (string assetPath in repeatAssets)
+        {
+            Debug.LogError("同一路径不应存在多个Baker:" + assetPath);
+        }
+        bakers.RemoveAll(item => repeatAssets.Contains(item.assetPath));
+
         for (int i = 0; i < bakers.Count; i++)
         {
             (string assetPath, GPUSkinningBaker baker) = bakers[i];
