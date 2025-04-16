@@ -9,6 +9,8 @@ internal class LodRenderGroup
 
     public readonly Material Material;
     public readonly Mesh Mesh;
+    public readonly int VertexCount;
+    public readonly int TriangleCount;
 
     public readonly List<RenderObject> RenderObjects = new();
 
@@ -17,6 +19,8 @@ internal class LodRenderGroup
         MaxDistance = maxDistance;
         Material = material;
         Mesh = mesh;
+        VertexCount = mesh.vertexCount;
+        TriangleCount = mesh.triangles.Length / 3;
     }
 }
 
@@ -94,13 +98,13 @@ public class RenderGroup
             _lodRenderGroups[index].RenderObjects.Add(renderObject);
         }
 
-        _lodRenderGroups.ForEach(group =>
+        foreach (var group in _lodRenderGroups)
         {
-            renderRusult.MeshVertexCount += group.Mesh.vertexCount;
-            renderRusult.InstanceFaceCount += group.Mesh.triangles.Length / 3 * group.RenderObjects.Count;
+            renderRusult.MeshVertexCount += group.VertexCount;
+            renderRusult.InstanceFaceCount += group.TriangleCount * group.RenderObjects.Count;
             _tempRenderGroup.DrawMeshInstanced(group.RenderObjects, group.Material, group.Mesh, cmd, shaderPass);
             group.RenderObjects.Clear();
-        });
+        }
 
         return renderRusult;
     }
@@ -128,13 +132,13 @@ public class RenderGroup
             _lodRenderGroups[index].RenderObjects.Add(renderObject);
         }
 
-        _lodRenderGroups.ForEach(group =>
+        foreach (var group in _lodRenderGroups)
         {
-            renderRusult.MeshVertexCount += group.Mesh.vertexCount;
-            renderRusult.InstanceFaceCount += group.Mesh.triangles.Length / 3 * group.RenderObjects.Count;
+            renderRusult.MeshVertexCount += group.VertexCount;
+            renderRusult.InstanceFaceCount += group.TriangleCount * group.RenderObjects.Count;
             _tempRenderGroup.DrawMeshInstanced(group.RenderObjects, group.Material, group.Mesh, isCastShadow, receiveShadows);
             group.RenderObjects.Clear();
-        });
+        }
 
         return renderRusult;
     }
