@@ -1,0 +1,38 @@
+name: Build and Package
+
+on:
+  push:
+    tags:
+      - /^\d+\.\d+\.\d+(-.*)?$/ # 匹配类似 1.0.0 或 1.0.0-test 的标签
+
+env:
+  ProductName: ybwork.GPUSkinning
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up PowerShell encoding
+        run: chcp.com 65001
+
+      - name: Update package.json version
+        shell: pwsh
+        run: |
+          $jsonFilePath = ".\Packages\$env:ProductName\package.json"
+          $jsonContent = Get-Content -Path $jsonFilePath -Raw | ConvertFrom-Json
+          $jsonContent.version = "${{ github.ref_name }}"
+          $jsonContent | ConvertTo-Json | Set-Content -Path $jsonFilePath
+
+      - name: Create package zip
+        shell: pwsh
+        run: |
+          Compress-Archive -Path ".\Packages\$env:ProductName" -DestinationPath "$env:ProductName@${{ github.ref_name }}.zip"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: ${{ env.ProductName }}@${{ github.ref_name }}.zip
